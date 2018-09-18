@@ -6,9 +6,9 @@
             <name>MBR_controlSystem_dsPIC33E</name>
             <creation-uuid>89d558c9-88d3-4882-a9c7-572d559d97ad</creation-uuid>
             <make-project-type>0</make-project-type>
-            <c-extensions/>
+            <c-extensions>c</c-extensions>
             <cpp-extensions/>
-            <header-extensions/>
+            <header-extensions>h</header-extensions>
             <asminc-extensions/>
             <sourceEncoding>UTF-8</sourceEncoding>
             <make-dep-projects/>
