@@ -1,0 +1,45 @@
+[submodule "Lib_H_PIC_oscillators"]
+	path = Lib_H_PIC_oscillators
+	url = https://github.com/Raptor26/Lib_H_PIC_oscillators.git
+[submodule "Lib_A_CRC_cyclic_redundancy_check"]
+	path = Lib_A_CRC_cyclic_redundancy_check
+	url = https://github.com/Raptor26/Lib_A_CRC_cyclic_redundancy_check.git
+[submodule "Lib_A_DI_debug_information"]
+	path = Lib_A_DI_debug_information
+	url = https://github.com/Raptor26/Lib_A_DI_debug_information.git
+[submodule "Lib_A_DIFF_differentiators"]
+	path = Lib_A_DIFF_differentiators
+	url = https://github.com/Raptor26/Lib_A_DIFF_differentiators.git
+[submodule "Lib_A_FILT_filters.c"]
+	path = Lib_A_FILT_filters.c
+	url = https://github.com/Raptor26/Lib_A_FILT_filters.git
+[submodule "Lib_A_NINTEG_numerical_integration"]
+	path = Lib_A_NINTEG_numerical_integration
+	url = https://github.com/Raptor26/Lib_A_NINTEG_numerical_integration.git
+[submodule "Lib_A_REGUL_regulators"]
+	path = Lib_A_REGUL_regulators
+	url = https://github.com/Raptor26/Lib_A_REGUL_regulators.git
+[submodule "Lib_A_RGBF_ring_buffer"]
+	path = Lib_A_RGBF_ring_buffer
+	url = https://github.com/Raptor26/Lib_A_RGBF_ring_buffer.git
+[submodule "Lib_A_VTMR_virtual_timers"]
+	path = Lib_A_VTMR_virtual_timers
+	url = https://github.com/Raptor26/Lib_A_VTMR_virtual_timers.git
+[submodule "Lib_H_MPU60x0_inertial_sensor"]
+	path = Lib_H_MPU60x0_inertial_sensor
+	url = https://github.com/Raptor26/Lib_H_MPU60x0_inertial_sensor.git
+[submodule "Lib_H_PIC_spi"]
+	path = Lib_H_PIC_spi
+	url = https://github.com/Raptor26/Lib_H_PIC_spi.git
+[submodule "Lib_H_PIC_uart"]
+	path = Lib_H_PIC_uart
+	url = https://github.com/Raptor26/Lib_H_PIC_uart.git
+[submodule "Lib_A_PTWT_prog_tact_with_timer"]
+	path = Lib_A_PTWT_prog_tact_with_timer
+	url = https://github.com/Raptor26/Lib_A_PTWT_prog_tact_with_timer.git
+[submodule "Lib_A_VMCPC_vmc_protocol_communicate"]
+	path = Lib_A_VMCPC_vmc_protocol_communicate
+	url = https://github.com/Raptor26/Lib_A_VMCPC_vmc_protocol_communicate.git
+[submodule "Lib_A_PCF_pitch_comp_filt"]
+	path = Lib_A_PCF_pitch_comp_filt
+	url = https://github.com/Raptor26/Lib_A_PCF_pitch_comp_filt.git

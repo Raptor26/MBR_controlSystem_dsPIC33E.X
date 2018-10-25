@@ -1,77 +1,82 @@
 /**
- * @file   	%<%NAME%>%.%<%EXTENSION%>%
- * @author 	%<%USER%>%
+ * @file   	IISMPU_internal_inert_sens_mpu.
+ * @author 	Kuroha
  * @version
- * @date 	%<%DATE%>%, %<%TIME%>%
+ * @date 	28 сентября 2018 г., 10:54
  * @brief
  */
 
 
-#ifndef MAIN_H_
-#define MAIN_H_
+#ifndef IISMPU_INTERNAL_INERT_SENS_MPU_H_
+#define IISMPU_INTERNAL_INERT_SENS_MPU_H_
 
-#define FCY                             64000000UL
+
 /*#### |Begin| --> Секция - "Include" ########################################*/
 /*==== |Begin| --> Секция - "C libraries" ====================================*/
-#include <stdio.h>
-#include <stdint.h>
-#include <math.h>
-#include <string.h>
 /*==== |End  | <-- Секция - "C libraries" ====================================*/
 
 /*==== |Begin| --> Секция - "MK peripheral libraries" ========================*/
 #include <xc.h>
+#include <libpic30.h>
 /*==== |End  | <-- Секция - "MK peripheral libraries" ========================*/
 
 /*==== |Begin| --> Секция - "Extern libraries" ===============================*/
-#include "../inc/BLEDS_board_leds.h"
-#include "../../Lib_H_PIC_oscillators/Lib_H_PIC_oscillators.h"
-#include "../inc/UDI_uart_debug_information.h"
-#include "../inc/HPT_hard_prog_tact.h"
-#include "../inc/MC32_hardware_counter_32.h"
-#include "../inc/IISMPU_internal_inert_sens_mpu.h"
-#include "../../Lib_A_PCF_pitch_comp_filt/Lib_A_PCF_pitch_comp_filt.h"
-#include "../../Lib_A_VTMR_virtual_timers/Lib_A_VTMR_virtual_timers.h"
-#include "../inc/UDI_uart_debug_information.h"
-#include "../inc/LRMC_left_right_motor_control.h"
-#include "../inc/RPA_robot_pitch_angle.h"
-#include "../inc/RBS_robot_balancing_system.h"
+#include "../../Lib_H_MPU60x0_inertial_sensor/Lib_H_mpu60x0_inertial_sensor.h"
+#include "../../Lib_H_PIC_spi/Lib_H_PIC_spi.h"
+#include "../inc/main.h"
 /*==== |End  | <-- Секция - "Extern libraries" ===============================*/
 /*#### |End  | <-- Секция - "Include" ########################################*/
 
 
 /*#### |Begin| --> Секция - "Определение констант" ###########################*/
-#define INTEGRATE_PERIOD_IN_SEC     ((float)((float)__HARD_PROG_TACT_IN_US__ / 1000000.0f))
-//#define __DI_MAX_PLOTS_IN_PACKAGE__ 30
-//#define __REGUL_FLOAT_POINT_TYPE__ float
-
-#define __PFPT__  float
-#if !defined (__PFPT__)
-#error "Please, set __PRPT__ float or double"
-#endif
 /*#### |End  | <-- Секция - "Определение констант" ###########################*/
 
 
 /*#### |Begin| --> Секция - "Определение типов" ##############################*/
+typedef enum
+{
+	IISMPU_ROLL = 0,
+	IISMPU_PITCH,
+	IISMPU_YAW,
+
+	/**
+	 * @brief Данное определение должно быть крайним в данном перечисляемом типе.
+	 *        Оно используется для определения размеров векторов показаний
+	 *        инерциального датчика
+	 */
+	IISMPU_VECT_SIZE,
+} iismpu_coordinate_system_definitions_s;
 /*#### |End  | <-- Секция - "Определение типов" ##############################*/
 
 
 /*#### |Begin| --> Секция - "Определение глобальных переменных" ##############*/
-extern float acc_a[3];
-extern float gyr_a[3];
-extern float mpuTemperature;
-extern char receiveTestMessage[];
+extern mpu60x0_spi_s IISMPU_SPIFnc_s;
+extern mpu60x0_lsb_s IISMPU_LSB_s;
+extern mpu60x0_data_s IISMPU_data_s;
 /*#### |End  | <-- Секция - "Определение глобальных переменных" ##############*/
 
 
 /*#### |Begin| --> Секция - "Прототипы глобальных функций" ###################*/
+extern void
+IISMPU_Init_AllPeriphForInternalMPU6000(
+	void);
+
+extern void
+IISMPU_GetAccGyrTemperature(
+	float *pAcc,
+	float *pGyr,
+	float *pTemperature);
+
+extern void
+IISMPU_SetNEDCoordinateSystem(
+	float pData[]);
 /*#### |End  | <-- Секция - "Прототипы глобальных функций" ###################*/
 
 
 /*#### |Begin| --> Секция - "Определение макросов" ###########################*/
 /*#### |End  | <-- Секция - "Определение макросов" ###########################*/
 
-#endif	/* MAIN_H_ */
+#endif	/* IISMPU_INTERNAL_INERT_SENS_MPU_H_ */
 
 /*############################################################################*/
 /*################################ END OF FILE ###############################*/

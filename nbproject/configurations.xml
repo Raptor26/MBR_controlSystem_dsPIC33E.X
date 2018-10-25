@@ -6,6 +6,104 @@
                    projectFiles="true">
       <itemPath>Prj/inc/main.h</itemPath>
       <itemPath>Prj/inc/configuration_bits.h</itemPath>
+      <itemPath>Prj/inc/BLEDS_board_leds.h</itemPath>
+      <itemPath>Prj/inc/HPT_hard_prog_tact.h</itemPath>
+      <itemPath>Prj/inc/UDI_uart_debug_information.h</itemPath>
+      <itemPath>Prj/inc/MC32_hardware_counter_32.h</itemPath>
+      <itemPath>Prj/inc/IISMPU_internal_inert_sens_mpu.h</itemPath>
+      <itemPath>Prj/inc/LRMC_left_right_motor_control.h</itemPath>
+      <itemPath>Prj/inc/RPA_robot_pitch_angle.h</itemPath>
+      <itemPath>Prj/inc/RBS_robot_balancing_system.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f2"
+                   displayName="Lib_A_CRC_cyclic_redundancy_check"
+                   projectFiles="true">
+      <itemPath>Lib_A_CRC_cyclic_redundancy_check/Lib_A_CRC_cyclic_redundancy_check.c</itemPath>
+      <itemPath>Lib_A_CRC_cyclic_redundancy_check/Lib_A_CRC_cyclic_redundancy_check.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f3"
+                   displayName="Lib_A_DI_debug_information"
+                   projectFiles="true">
+      <itemPath>Lib_A_DI_debug_information/Lib_A_DI_debug_information.c</itemPath>
+      <itemPath>Lib_A_DI_debug_information/Lib_A_DI_debug_information.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f4"
+                   displayName="Lib_A_DIFF_differentiators"
+                   projectFiles="true">
+      <itemPath>Lib_A_DIFF_differentiators/Lib_A_DIFF_differentiators.c</itemPath>
+      <itemPath>Lib_A_DIFF_differentiators/Lib_A_DIFF_differentiators.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f5" displayName="Lib_A_FILT_filters.c" projectFiles="true">
+      <itemPath>Lib_A_FILT_filters.c/Lib_A_FILT_filters.c</itemPath>
+      <itemPath>Lib_A_FILT_filters.c/Lib_A_FILT_filters.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f6"
+                   displayName="Lib_A_NINTEG_numerical_integration"
+                   projectFiles="true">
+      <itemPath>Lib_A_NINTEG_numerical_integration/Lib_A_NINTEG_numerical_integration.c</itemPath>
+      <itemPath>Lib_A_NINTEG_numerical_integration/Lib_A_NINTEG_numerical_integration.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="Lib_A_PCF_pitch_comp_filt"
+                   displayName="Lib_A_PCF_pitch_comp_filt"
+                   projectFiles="true">
+      <itemPath>Lib_A_PCF_pitch_comp_filt/Lib_A_PCF_pitch_comp_filt.c</itemPath>
+      <itemPath>Lib_A_PCF_pitch_comp_filt/Lib_A_PCF_pitch_comp_filt.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="Lib_A_PTWT_prog_tact_with_timer"
+                   displayName="Lib_A_PTWT_prog_tact_with_timer"
+                   projectFiles="true">
+      <itemPath>Lib_A_PTWT_prog_tact_with_timer/Lib_A_PTWT_prog_tact_with_timer.c</itemPath>
+      <itemPath>Lib_A_PTWT_prog_tact_with_timer/Lib_A_PTWT_prog_tact_with_timer.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f7"
+                   displayName="Lib_A_REGUL_regulators"
+                   projectFiles="true">
+      <itemPath>Lib_A_REGUL_regulators/Lib_A_REGUL_regulators.c</itemPath>
+      <itemPath>Lib_A_REGUL_regulators/Lib_A_REGUL_regulators.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f8"
+                   displayName="Lib_A_RGBF_ring_buffer"
+                   projectFiles="true">
+      <itemPath>Lib_A_RGBF_ring_buffer/Lib_A_RGBF_ring_buffer.c</itemPath>
+      <itemPath>Lib_A_RGBF_ring_buffer/Lib_A_RGBF_ring_buffer.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="Lib_A_VMCPC_vmc_protocol_communicate"
+                   displayName="Lib_A_VMCPC_vmc_protocol_communicate"
+                   projectFiles="true">
+      <itemPath>Lib_A_VMCPC_vmc_protocol_communicate/Lib_A_VMCPC_vmc_protocol_communicate.c</itemPath>
+      <itemPath>Lib_A_VMCPC_vmc_protocol_communicate/Lib_A_VMCPC_vmc_protocol_communicate.h</itemPath>
+      <itemPath>Lib_A_VMCPC_vmc_protocol_communicate/Lib_A_VMCPC_F3M_vmc_protocol_communicate.c</itemPath>
+      <itemPath>Lib_A_VMCPC_vmc_protocol_communicate/Lib_A_VMCPC_F3M_vmc_protocol_communicate.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f9"
+                   displayName="Lib_A_VTMR_virtual_timers"
+                   projectFiles="true">
+      <itemPath>Lib_A_VTMR_virtual_timers/Lib_A_VTMR_virtual_timers.c</itemPath>
+      <itemPath>Lib_A_VTMR_virtual_timers/Lib_A_VTMR_virtual_timers.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="Lib_H_MPU60x0_inertial_sensor"
+                   displayName="Lib_H_MPU60x0_inertial_sensor"
+                   projectFiles="true">
+      <itemPath>Lib_H_MPU60x0_inertial_sensor/Lib_H_mpu60x0_inertial_sensor.c</itemPath>
+      <itemPath>Lib_H_MPU60x0_inertial_sensor/Lib_H_mpu60x0_inertial_sensor.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="f1"
+                   displayName="Lib_H_PIC_oscillators"
+                   projectFiles="true">
+      <itemPath>Lib_H_PIC_oscillators/Lib_H_PIC_oscillators.c</itemPath>
+      <itemPath>Lib_H_PIC_oscillators/Lib_H_PIC_oscillators.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="Lib_H_PIC_spi"
+                   displayName="Lib_H_PIC_spi"
+                   projectFiles="true">
+      <itemPath>Lib_H_PIC_spi/Lib_H_PIC_spi.c</itemPath>
+      <itemPath>Lib_H_PIC_spi/Lib_H_PIC_spi.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="Lib_H_PIC_uart"
+                   displayName="Lib_H_PIC_uart"
+                   projectFiles="true">
+      <itemPath>Lib_H_PIC_uart/Lib_H_PIC_uart.c</itemPath>
+      <itemPath>Lib_H_PIC_uart/Lib_H_PIC_uart.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -15,6 +113,14 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>Prj/src/main.c</itemPath>
+      <itemPath>Prj/src/BLEDS_board_leds.c</itemPath>
+      <itemPath>Prj/src/HPT_hard_prog_tact.c</itemPath>
+      <itemPath>Prj/src/UDI_uart_debug_information.c</itemPath>
+      <itemPath>Prj/src/MC32_hardware_counter_32.c</itemPath>
+      <itemPath>Prj/src/IISMPU_internal_inert_sens_mpu.c</itemPath>
+      <itemPath>Prj/src/LRMC_left_right_motor_control.c</itemPath>
+      <itemPath>Prj/src/RPA_robot_pitch_angle.c</itemPath>
+      <itemPath>Prj/src/RBS_robot_balancing_system.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -23,7 +129,21 @@
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
+    <Elem>.</Elem>
     <Elem>Prj/inc</Elem>
+    <Elem>Prj/src</Elem>
+    <Elem>Lib_H_PIC_oscillators</Elem>
+    <Elem>Lib_A_CRC_cyclic_redundancy_check</Elem>
+    <Elem>Lib_A_DI_debug_information</Elem>
+    <Elem>Lib_A_DIFF_differentiators</Elem>
+    <Elem>Lib_A_FILT_filters.c</Elem>
+    <Elem>Lib_A_NINTEG_numerical_integration</Elem>
+    <Elem>Lib_A_REGUL_regulators</Elem>
+    <Elem>Lib_A_RGBF_ring_buffer</Elem>
+    <Elem>Lib_A_VTMR_virtual_timers</Elem>
+    <Elem>Lib_H_MPU60x0_inertial_sensor</Elem>
+    <Elem>Lib_H_PIC_spi</Elem>
+    <Elem>Lib_H_PIC_uart</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -35,7 +155,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC16</languageToolchain>
-        <languageToolchainVersion>1.33</languageToolchainVersion>
+        <languageToolchainVersion>1.35</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <packs>
@@ -100,7 +220,8 @@
         <property key="optimization-level" value="0"/>
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
-        <property key="preprocessor-macros" value="__FRC__"/>
+        <property key="preprocessor-macros"
+                  value="__FRC__;__PFPT__=float;__PCB_758725_124_03__;__DI_MAX_PLOTS_IN_PACKAGE__=30;__HARD_PROG_TACT_IN_US__=1000u;__USE_FRC_FOR_FCY__;__REGUL_FPT__=__PFPT__;__VMCPC_FPT__=__PFPT__;__NUNTEG_FPT__=__PFPT__;__DIFF_FPT__=__PFPT__;__PCF_FPT__=__PFPT__"/>
         <property key="scalar-model" value="default"/>
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
@@ -176,7 +297,7 @@
       <C30Global>
         <property key="common-include-directories" value=""/>
         <property key="dual-boot-partition" value="0"/>
-        <property key="fast-math" value="false"/>
+        <property key="fast-math" value="true"/>
         <property key="generic-16-bit" value="false"/>
         <property key="legacy-libc" value="true"/>
         <property key="mpreserve-all" value="false"/>
