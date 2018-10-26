@@ -14,16 +14,13 @@
 /*#### |Begin| --> Секция - "Include" ########################################*/
 /*==== |Begin| --> Секция - "C libraries" ====================================*/
 #include <math.h>
+#include <stdio.h>
 /*==== |End  | <-- Секция - "C libraries" ====================================*/
 
 /*==== |Begin| --> Секция - "MK peripheral libraries" ========================*/
 /*==== |End  | <-- Секция - "MK peripheral libraries" ========================*/
 
 /*==== |Begin| --> Секция - "Extern libraries" ===============================*/
-#include "../inc/RPA_robot_pitch_angle.h"
-#include "../../Lib_A_REGUL_regulators/Lib_A_REGUL_regulators.h"
-#include "../../Lib_A_FILT_filters.c/Lib_A_FILT_filters.h"
-#include "main.h"
 /*==== |End  | <-- Секция - "Extern libraries" ===============================*/
 /*#### |End  | <-- Секция - "Include" ########################################*/
 

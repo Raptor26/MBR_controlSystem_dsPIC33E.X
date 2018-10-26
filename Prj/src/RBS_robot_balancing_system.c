@@ -62,7 +62,7 @@ RBS_Init_BalancingSystem(
 
 	p_s->startSystem_flag = 0u;
     
-    p_s->speedControl_s.control_data_s = c_data_s;
+    p_s->speedControl_s.control_data_s = *c_data_s;
 }
 
 __PFPT__
@@ -128,7 +128,7 @@ RBS_GetDesiredAngle(
 
 	/* Ошибка скорости*/
 	__PFPT__ error =
-		-pSpeedControl_s->control_data_s->targetSpeed + pSpeedControl_s->currSpeedFilt;
+		-pSpeedControl_s->control_data_s.targetSpeed + pSpeedControl_s->currSpeedFilt;
 
 	pSpeedControl_s->piRegulator_s.proportional_s.kP = -(((__RBS_fabs(error)) * 9.01f) + 0.05);
 //	pSpeedControl_s->piRegulator_s.integral_s.kI =
