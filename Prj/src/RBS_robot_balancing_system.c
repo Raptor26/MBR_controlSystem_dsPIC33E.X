@@ -45,8 +45,7 @@ RBS_GetDesiredAngle(
 /*#### |Begin| --> Секция - "Описание глобальных функций" ####################*/
 void
 RBS_Init_BalancingSystem(
-	rbs_balancing_system_s *p_s,
-    cmp_control_data_s *c_data_s)
+	rbs_balancing_system_s *p_s)
 {
 	/* Инициализация ПД регулятора для удержания заданного угла наклона */
 	RBS_Init_PD_ForRetentionDesiredPitchAngle(
@@ -61,8 +60,6 @@ RBS_Init_BalancingSystem(
 	p_s->desiredAngle = (__PFPT__) 0.0;
 
 	p_s->startSystem_flag = 0u;
-    
-    p_s->speedControl_s.control_data_s = *c_data_s;
 }
 
 __PFPT__

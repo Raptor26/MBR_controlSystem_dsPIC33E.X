@@ -105,8 +105,7 @@ extern rbs_balancing_system_s RBS_balancingSystem_s;
 /*#### |Begin| --> Секция - "Прототипы глобальных функций" ###################*/
 extern void
 RBS_Init_BalancingSystem(
-	rbs_balancing_system_s *p_s,
-    cmp_control_data_s *c_data_s);
+	rbs_balancing_system_s *p_s);
 
 extern __PFPT__
 RBS_GetControlForRobot(

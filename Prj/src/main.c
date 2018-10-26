@@ -169,11 +169,10 @@ InitAllPeriphAndModules(
 	RPA_Init_DataForCalcPitchAngle();
 
 	CMP_init_struct(
-		&controlRobot_s);
+		&RBS_balancingSystem_s.speedControl_s.control_data_s);
 
 	RBS_Init_BalancingSystem(
-		&RBS_balancingSystem_s,
-		&controlRobot_s);
+		&RBS_balancingSystem_s);
 
 	/* Разрешение глобальных прерываний */
 	_GIE = 1;
