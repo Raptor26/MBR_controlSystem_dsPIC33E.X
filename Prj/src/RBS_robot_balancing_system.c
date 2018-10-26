@@ -45,7 +45,8 @@ RBS_GetDesiredAngle(
 /*#### |Begin| --> Секция - "Описание глобальных функций" ####################*/
 void
 RBS_Init_BalancingSystem(
-	rbs_balancing_system_s *p_s)
+	rbs_balancing_system_s *p_s,
+    cmp_control_data_s *c_data_s)
 {
 	/* Инициализация ПД регулятора для удержания заданного угла наклона */
 	RBS_Init_PD_ForRetentionDesiredPitchAngle(
@@ -60,6 +61,8 @@ RBS_Init_BalancingSystem(
 	p_s->desiredAngle = (__PFPT__) 0.0;
 
 	p_s->startSystem_flag = 0u;
+    
+    p_s->speedControl_s.control_data_s = c_data_s;
 }
 
 __PFPT__
@@ -82,7 +85,6 @@ RBS_GetControlForRobot(
 		p_s->motorControl_a[RBS_RIGHT_MOTOR]	= (__PFPT__) 0.0;
 		p_s->speedControl_s.currSpeed			= (__PFPT__) 0.0;
 		p_s->speedControl_s.currSpeedFilt		= (__PFPT__) 0.0;
-		p_s->speedControl_s.target				= (__PFPT__) 0.0;
 		p_s->speedControl_s.piRegulator_s.integral_s.val = (__PFPT__) 0.0;
 		p_s->startSystem_flag = 0u;
 	}
@@ -126,7 +128,7 @@ RBS_GetDesiredAngle(
 
 	/* Ошибка скорости*/
 	__PFPT__ error =
-		-pSpeedControl_s->target + pSpeedControl_s->currSpeedFilt;
+		-pSpeedControl_s->control_data_s->targetSpeed + pSpeedControl_s->currSpeedFilt;
 
 	pSpeedControl_s->piRegulator_s.proportional_s.kP = -(((__RBS_fabs(error)) * 9.01f) + 0.05);
 //	pSpeedControl_s->piRegulator_s.integral_s.kI =

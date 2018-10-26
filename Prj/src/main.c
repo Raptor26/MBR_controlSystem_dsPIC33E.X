@@ -18,13 +18,15 @@ float acc_a[IISMPU_VECT_SIZE];
 float gyr_a[IISMPU_VECT_SIZE];
 float mpuTemperature;
 double testDouble = 5.0;
-
-char testMessage_a[] = "Hello World.\r\n";
 /*#### |End  | <-- Секция - "Глобальные переменные" ##########################*/
 
 
 /*#### |Begin| --> Секция - "Локальные переменные" ###########################*/
+int controlCmdSize = 8;
+char recievedControlCmd[8];
 VTMR_tmr_s compFiltRuntime_s;
+cmp_control_data_s controlRobot_s;
+size_t dmaReceiveEn_flag = 1;
 /*#### |End  | <-- Секция - "Локальные переменные" ###########################*/
 
 
@@ -85,10 +87,22 @@ int main(
 				(__VMCPC_F3M_FPT__) RBS_balancingSystem_s.motorControl_a[RBS_RIGHT_MOTOR]);
 		}
 
+		if (dmaReceiveEn_flag == 1)
+		{
+			dmaReceiveEn_flag = 0;
+
+			memset((void*) recievedControlCmd, '\0', controlCmdSize);
+
+			UDI_StartForceUart3_DMA4_Receiver((unsigned int*)recievedControlCmd, controlCmdSize);
+			UDI_GetAndSendDebugPackForSerialPlot(
+				&UDI_serialPlotDataPackage_s);
+			dmaReceiveEn_flag = 1;
+		}
+
 		/* ################ Отладочная информация ####################### */
 		/* Формирование отладочного пакета данных */
-		UDI_GetAndSendDebugPackForSerialPlot(
-			&UDI_serialPlotDataPackage_s);
+		//UDI_GetAndSendDebugPackForSerialPlot(
+		//&UDI_serialPlotDataPackage_s);
 		/* ############################################################## */
 
 		PTWT_ProgTactEndLoop(
@@ -117,11 +131,11 @@ InitAllPeriphAndModules(
 #else
 #error "Please, set source for system clock"
 #endif
-	
-	/* Задержка чтобы успел проинициализироваться констроллер 
+
+	/* Задержка чтобы успел проинициализироваться констроллер
 	 * векторного управления */
 	__delay_ms(100u);
-	
+
 	/* Инициализация светодиодов платы */
 	BLEDS_Init_AllLeds();
 
@@ -154,9 +168,13 @@ InitAllPeriphAndModules(
 
 	RPA_Init_DataForCalcPitchAngle();
 
+	CMP_init_struct(
+		&controlRobot_s);
+
 	RBS_Init_BalancingSystem(
-		&RBS_balancingSystem_s);
-		
+		&RBS_balancingSystem_s,
+		&controlRobot_s);
+
 	/* Разрешение глобальных прерываний */
 	_GIE = 1;
 }
