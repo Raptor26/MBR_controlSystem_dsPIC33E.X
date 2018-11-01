@@ -257,7 +257,6 @@ UDI_Init_DMA3_For_Uart3Tx(
 void
 UDI_Init_DMA4_For_Uart3Rx(void)
 {
-	{
 		DMA4CONbits.AMODE = 0; //	Configure DMA for Register Indirect mode
 //								with post-increment
 		DMA4CONbits.SIZE = 1;
@@ -276,7 +275,6 @@ UDI_Init_DMA4_For_Uart3Rx(void)
 
 		IFS2bits.DMA4IF = 0; // Clear DMA Interrupt Flag
 		IEC2bits.DMA4IE = 1; // Enable DMA Interrupt
-	}
 }
 
 
@@ -313,6 +311,8 @@ _DMA4Interrupt (void)
 
 	/* Отключение канала DMA */
 	DMA4CONbits.CHEN = 0;
+    
+    CMP_receiveMessage_flag++;
 }
 /* Написать обработчик прерывания */
 /*#### |End  | <-- Секция - "Описание глобальных функций" ####################*/

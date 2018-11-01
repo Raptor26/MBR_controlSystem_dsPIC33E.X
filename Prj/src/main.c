@@ -22,11 +22,10 @@ double testDouble = 5.0;
 
 
 /*#### |Begin| --> Секция - "Локальные переменные" ###########################*/
-int controlCmdSize = 8;
-char recievedControlCmd[8];
+char recievedControlCmd[7];
+unsigned int controlCmdSize = sizeof (recievedControlCmd);
 VTMR_tmr_s compFiltRuntime_s;
 cmp_control_data_s controlRobot_s;
-size_t dmaReceiveEn_flag = 1;
 /*#### |End  | <-- Секция - "Локальные переменные" ###########################*/
 
 
@@ -87,22 +86,35 @@ int main(
 				(__VMCPC_F3M_FPT__) RBS_balancingSystem_s.motorControl_a[RBS_RIGHT_MOTOR]);
 		}
 
-		if (dmaReceiveEn_flag == 1)
+		if (CMP_receiveMessage_flag != 0 && DMA4CONbits.CHEN == 0)
 		{
-			dmaReceiveEn_flag = 0;
+			CMP_receiveMessage_flag = 0;
 
+			/* Обработать принятый пакет */
+			CMP_parse_message(
+				&RBS_balancingSystem_s.speedControl_s.control_data_s,
+				recievedControlCmd);
+
+			/* Забить память нулями */
 			memset((void*) recievedControlCmd, '\0', controlCmdSize);
 
-			UDI_StartForceUart3_DMA4_Receiver((unsigned int*)recievedControlCmd, controlCmdSize);
-			UDI_GetAndSendDebugPackForSerialPlot(
-				&UDI_serialPlotDataPackage_s);
-			dmaReceiveEn_flag = 1;
+//			/* Запусить DMA на прием данных */
+//			UDI_StartForceUart3_DMA4_Receiver(
+//				(unsigned int*)recievedControlCmd,
+//				controlCmdSize);
+		}
+
+		if (DMA4CONbits.CHEN == 0 && U3STAbits.RIDLE == 1)
+		{
+			UDI_StartForceUart3_DMA4_Receiver(
+				(unsigned int*)recievedControlCmd,
+				controlCmdSize);
 		}
 
 		/* ################ Отладочная информация ####################### */
 		/* Формирование отладочного пакета данных */
-		//UDI_GetAndSendDebugPackForSerialPlot(
-		//&UDI_serialPlotDataPackage_s);
+//		UDI_GetAndSendDebugPackForSerialPlot(
+//			&UDI_serialPlotDataPackage_s);
 		/* ############################################################## */
 
 		PTWT_ProgTactEndLoop(
@@ -142,7 +154,16 @@ InitAllPeriphAndModules(
 	/* Инициализация UART модуля для передачи отладочной информации */
 	UDI_Init_All_UART3_RxTx_With_DMA_Tx(
 		(unsigned int long) FCY,
-		(unsigned int long) 660000UL);
+		(unsigned int long) 9600UL);
+
+//    Конфигурация Bluetooth модуля:
+//    AT+NAME=NCFU
+//    AT+PSWD="NCFU9999"
+//    AT+UART=460800,0,0
+
+	UDI_StartForceUart3_DMA4_Receiver(
+		(unsigned int*)recievedControlCmd,
+		controlCmdSize);
 
 	/* Инициализация аппаратного таймера для тактирования цикла while(1) */
 	HPT_Init_TMR9ForProgTact_PTWTLibrary(

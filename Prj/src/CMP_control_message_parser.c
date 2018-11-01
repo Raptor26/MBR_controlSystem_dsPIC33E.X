@@ -12,7 +12,8 @@
 /*#### |End  | <-- Секция - "Include" ########################################*/
 
 
-/*#### |Begin| --> Секция - "Глобальные переменные" ##########################*/
+/*### |Begin| --> Секция - "Глобальные переменные" ##########################*/
+size_t CMP_receiveMessage_flag;
 /*#### |End  | <-- Секция - "Глобальные переменные" ##########################*/
 
 
@@ -21,6 +22,10 @@
 
 
 /*#### |Begin| --> Секция - "Прототипы локальных функций" ####################*/
+int16_t
+CMP_GetControlVal(
+	char* num,
+	int16_t saturationVal);
 /*#### |End  | <-- Секция - "Прототипы локальных функций" ####################*/
 
 
@@ -31,8 +36,10 @@ CMP_init_struct(
 {
 	data->targetRotation  = (__PFPT__) 0.0;
 	data->targetSpeed     = (__PFPT__) 0.0;
-	data->maxControlValue = (__PFPT__) 1024.0;
-	data->zeroValue = (__PFPT__) (data->maxControlValue / 2.0);
+	data->maxControlValue = (int16_t) 1024;
+	data->zeroValue       = (int16_t) (data->maxControlValue / ((__PFPT__) 2.0));
+	data->discreteInc     =
+		(__PFPT__) ((__PFPT__) 1.0) / ((__PFPT__) data->zeroValue);
 }
 
 void
@@ -40,27 +47,53 @@ CMP_parse_message(
 	cmp_control_data_s *data,
 	char *controlCmd)
 {
-	if (controlCmd[0] == 'S')
+	if (*controlCmd != 0 &&
+			controlCmd[5] == '\r' &&
+			controlCmd[6] == '\n')
 	{
-		// Скорость
-		int speed;
-		sscanf(controlCmd, "S%d\r\n", &speed);
-		data->targetSpeed = (__PFPT__) (speed) - data->zeroValue;
-
+		int16_t number;
+		switch (controlCmd[0])
+		{
+		case 'S':
+			// Скорость
+			// S0344\r\n
+			// sscanf(controlCmd, "S%d\r\n", &number);
+			number = CMP_GetControlVal(
+						 (char*) &controlCmd[1],
+						 data->maxControlValue);
+			data->targetSpeed =
+				((__PFPT__) (number - data->zeroValue)) * data->discreteInc;
+			break;
+		case 'D':
+			// Направление
+			// sscanf(controlCmd, "D%d\r\n", &number);
+//			number = (int16_t) atoi((char*) &controlCmd[1]);
+//			number = CMP_CheckMinMaxVal(number, data->maxControlValue);
+			number = CMP_GetControlVal(
+						 (char*) &controlCmd[1],
+						 data->maxControlValue);
+			data->targetRotation =
+				((__PFPT__) (number - data->zeroValue)) * data->discreteInc;
+			break;
+		}
 	}
-	else if (controlCmd[0] == 'D')
-	{
-		// Направление
-		int direction;
-		sscanf(controlCmd, "D%d\r\n", &direction);
-		data->targetSpeed = (__PFPT__) (direction) - data->zeroValue;
-	}
-	return;
 }
 /*#### |End  | <-- Секция - "Описание глобальных функций" ####################*/
 
 
 /*#### |Begin| --> Секция - "Описание локальных функций" #####################*/
+int16_t
+CMP_GetControlVal(
+	char* num,
+	int16_t saturationVal)
+{
+	int16_t val = (int16_t) atoi(num);
+	if (val < 0 || val > saturationVal)
+	{
+		return saturationVal / 2;
+	}
+	return val;
+}
 /*#### |End  | <-- Секция - "Описание локальных функций" #####################*/
 
 

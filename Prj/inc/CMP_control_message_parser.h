@@ -15,6 +15,8 @@
 /*==== |Begin| --> Секция - "C libraries" ====================================*/
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 /*==== |End  | <-- Секция - "C libraries" ====================================*/
 
 /*==== |Begin| --> Секция - "MK peripheral libraries" ========================*/
@@ -45,17 +47,20 @@ typedef struct
 	/**
 	    * @brief Максимальное значение, которое регулирует скорость и поворот
 	    */
-	__PFPT__ maxControlValue;
+	int16_t maxControlValue;
+
+	__PFPT__  discreteInc;
 
 	/**
 	    * @brief Нулевое значение (равно половине от максимального значения)
 	    */
-	__PFPT__ zeroValue;
+	int16_t zeroValue;
 } cmp_control_data_s;
 /*#### |End  | <-- Секция - "Определение типов" ##############################*/
 
 
 /*#### |Begin| --> Секция - "Определение глобальных переменных" ##############*/
+extern size_t CMP_receiveMessage_flag;
 /*#### |End  | <-- Секция - "Определение глобальных переменных" ##############*/
 
 
