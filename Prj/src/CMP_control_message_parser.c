@@ -36,47 +36,59 @@ CMP_init_struct(
 {
 	data->targetRotation  = (__PFPT__) 0.0;
 	data->targetSpeed     = (__PFPT__) 0.0;
+	data->targetMaxVal     = 0.7;
 	data->maxControlValue = (int16_t) 1024;
+	data->maxTimeout      = (uint32_t) 200000u;
 	data->zeroValue       = (int16_t) (data->maxControlValue / ((__PFPT__) 2.0));
 	data->discreteInc     =
-		(__PFPT__) ((__PFPT__) 1.0) / ((__PFPT__) data->zeroValue);
+		(__PFPT__) ((__PFPT__) 0.4) / ((__PFPT__) data->zeroValue);
+
+	data->filtForTargetSpeed_s.filtCoeff =
+		(__FILT_FPT__) 0.7;
+	data->filtForTargetRotation_s.filtCoeff =
+		(__FILT_FPT__) 0.05;
+
+	VTMR_InitTimerStruct(
+		&data->virtTmr,
+		(uint16_t*) &HC32_UPPER_CNT,
+		(uint16_t*) &HC32_LOWER_CNT);
+
+	VTMR_StartTimer(&data->virtTmr);
 }
 
-void
+cmp_message_status_e
 CMP_parse_message(
 	cmp_control_data_s *data,
 	char *controlCmd)
 {
 	if (*controlCmd != 0 &&
+			controlCmd[0] == 'S' &&
 			controlCmd[5] == '\r' &&
-			controlCmd[6] == '\n')
+			controlCmd[6] == '\n' &&
+			controlCmd[7] == 'D' &&
+			controlCmd[12] == '\r' &&
+			controlCmd[13] == '\n')
 	{
-		int16_t number;
-		switch (controlCmd[0])
-		{
-		case 'S':
-			// Скорость
-			// S0344\r\n
-			// sscanf(controlCmd, "S%d\r\n", &number);
-			number = CMP_GetControlVal(
-						 (char*) &controlCmd[1],
-						 data->maxControlValue);
-			data->targetSpeed =
-				((__PFPT__) (number - data->zeroValue)) * data->discreteInc;
-			break;
-		case 'D':
-			// Направление
-			// sscanf(controlCmd, "D%d\r\n", &number);
-//			number = (int16_t) atoi((char*) &controlCmd[1]);
-//			number = CMP_CheckMinMaxVal(number, data->maxControlValue);
-			number = CMP_GetControlVal(
-						 (char*) &controlCmd[1],
-						 data->maxControlValue);
-			data->targetRotation =
-				((__PFPT__) (number - data->zeroValue)) * data->discreteInc;
-			break;
-		}
+		// Скорость
+		int16_t number =
+			CMP_GetControlVal(
+				(char*) &controlCmd[1],
+				data->maxControlValue);
+		data->targetSpeed =
+			FILT_Complementary_fpt(
+				&data->filtForTargetSpeed_s,
+				((__PFPT__) (number - data->zeroValue)) * data->discreteInc);
+		number =
+			CMP_GetControlVal(
+				(char*) &controlCmd[8],
+				data->maxControlValue);
+		data->targetRotation =
+			FILT_Complementary_fpt(
+				&data->filtForTargetRotation_s,
+				((__PFPT__) (number - data->zeroValue)) * data->discreteInc);
+		return CMP_MESSAGE_VALID;
 	}
+	return CMP_MESSAGE_INVALID;
 }
 /*#### |End  | <-- Секция - "Описание глобальных функций" ####################*/
 
@@ -88,10 +100,20 @@ CMP_GetControlVal(
 	int16_t saturationVal)
 {
 	int16_t val = (int16_t) atoi(num);
-	if (val < 0 || val > saturationVal)
+
+	if (val < 0)
 	{
-		return saturationVal / 2;
+		val = 0;
 	}
+	else if (val > saturationVal)
+	{
+		val = saturationVal;
+	}
+//	if (val < 0 || val > saturationVal)
+//	{
+//        /* FIXME 512 заменить на переменную */
+//		return 512;
+//	}
 	return val;
 }
 /*#### |End  | <-- Секция - "Описание локальных функций" #####################*/

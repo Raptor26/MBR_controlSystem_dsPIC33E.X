@@ -62,9 +62,12 @@
 
 
 /*#### |Begin| --> Секция - "Определение глобальных переменных" ##############*/
+extern char debugControlCmd[50];
 extern float acc_a[3];
 extern float gyr_a[3];
 extern float mpuTemperature;
+extern unsigned int controlCmdSize;
+extern char recievedControlCmd[14];
 /*#### |End  | <-- Секция - "Определение глобальных переменных" ##############*/
 
 

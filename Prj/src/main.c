@@ -14,15 +14,15 @@
 
 
 /*#### |Begin| --> Секция - "Глобальные переменные" ##########################*/
+char debugControlCmd[50];
 float acc_a[IISMPU_VECT_SIZE];
 float gyr_a[IISMPU_VECT_SIZE];
 float mpuTemperature;
-double testDouble = 5.0;
 /*#### |End  | <-- Секция - "Глобальные переменные" ##########################*/
 
 
 /*#### |Begin| --> Секция - "Локальные переменные" ###########################*/
-char recievedControlCmd[7];
+char recievedControlCmd[14];
 unsigned int controlCmdSize = sizeof (recievedControlCmd);
 VTMR_tmr_s compFiltRuntime_s;
 cmp_control_data_s controlRobot_s;
@@ -71,6 +71,25 @@ int main(
 		VTMR_GetTimerValue(
 			&compFiltRuntime_s);
 
+
+		uint32_t testTime =
+			VTMR_GetTimerValue(
+				&RBS_balancingSystem_s.speedControl_s.control_data_s.virtTmr);
+
+		if ((VTMR_GetTimerValue(
+					&RBS_balancingSystem_s.speedControl_s.control_data_s.virtTmr))
+				>= ((uint32_t)RBS_balancingSystem_s.speedControl_s.control_data_s.maxTimeout))
+		{
+			RBS_balancingSystem_s.speedControl_s.control_data_s.targetSpeed =
+				FILT_Complementary_fpt(
+					&RBS_balancingSystem_s.speedControl_s.control_data_s.filtForTargetSpeed_s,
+					(__PFPT__) 0.0);
+			RBS_balancingSystem_s.speedControl_s.control_data_s.targetRotation =
+				FILT_Complementary_fpt(
+					&RBS_balancingSystem_s.speedControl_s.control_data_s.filtForTargetRotation_s,
+					(__PFPT__) 0.0);
+		}
+
 		__PFPT__ leftRightMotorControl =
 			RBS_GetControlForRobot(
 				&RBS_balancingSystem_s,
@@ -91,25 +110,43 @@ int main(
 			CMP_receiveMessage_flag = 0;
 
 			/* Обработать принятый пакет */
-			CMP_parse_message(
-				&RBS_balancingSystem_s.speedControl_s.control_data_s,
-				recievedControlCmd);
+			cmp_message_status_e messageStatus_e =
+				CMP_parse_message(
+					&RBS_balancingSystem_s.speedControl_s.control_data_s,
+					recievedControlCmd);
+
+			if (messageStatus_e == CMP_MESSAGE_VALID)
+			{
+				VTMR_StartTimer(
+					&RBS_balancingSystem_s.speedControl_s.control_data_s.virtTmr);
+			}
 
 			/* Забить память нулями */
 			memset((void*) recievedControlCmd, '\0', controlCmdSize);
 
-//			/* Запусить DMA на прием данных */
-//			UDI_StartForceUart3_DMA4_Receiver(
+			int bytesCnt =
+				sprintf(
+					debugControlCmd,
+					"speed = %f\r\ndirect = %f",
+					RBS_balancingSystem_s.speedControl_s.control_data_s.targetSpeed,
+					RBS_balancingSystem_s.speedControl_s.control_data_s.targetRotation);
+
+//			UDI_StartForceUart3_DMA3_Transmit(
+//				(unsigned int*)debugControlCmd,
+//				(unsigned int) bytesCnt);
+
+			/* Запусить DMA на прием данных */
+//            UDI_StartForceUart3_DMA4_Receiver(
 //				(unsigned int*)recievedControlCmd,
 //				controlCmdSize);
 		}
 
-		if (DMA4CONbits.CHEN == 0 && U3STAbits.RIDLE == 1)
-		{
-			UDI_StartForceUart3_DMA4_Receiver(
-				(unsigned int*)recievedControlCmd,
-				controlCmdSize);
-		}
+//		if (DMA4CONbits.CHEN == 0 && U3STAbits.RIDLE == 1)
+//		{
+//			UDI_StartForceUart3_DMA4_Receiver(
+//				(unsigned int*)recievedControlCmd,
+//				controlCmdSize);
+//		}
 
 		/* ################ Отладочная информация ####################### */
 		/* Формирование отладочного пакета данных */
@@ -184,8 +221,8 @@ InitAllPeriphAndModules(
 
 	VTMR_InitTimerStruct(
 		&compFiltRuntime_s,
-		(uint16_t*) &TMR7,
-		(uint16_t*) &TMR6);
+		(uint16_t*) &HC32_UPPER_CNT,
+		(uint16_t*) &HC32_LOWER_CNT);
 
 	RPA_Init_DataForCalcPitchAngle();
 

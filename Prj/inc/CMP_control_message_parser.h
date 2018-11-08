@@ -23,6 +23,9 @@
 /*==== |End  | <-- Секция - "MK peripheral libraries" ========================*/
 
 /*==== |Begin| --> Секция - "Extern libraries" ===============================*/
+#include "../../Lib_A_VTMR_virtual_timers/Lib_A_VTMR_virtual_timers.h"
+#include "../inc/MC32_hardware_counter_32.h"
+#include "../../Lib_A_FILT_filters.c/Lib_A_FILT_filters.h"
 /*==== |End  | <-- Секция - "Extern libraries" ===============================*/
 /*#### |End  | <-- Секция - "Include" ########################################*/
 
@@ -32,6 +35,12 @@
 
 
 /*#### |Begin| --> Секция - "Определение типов" ##############################*/
+typedef enum
+{
+    CMP_MESSAGE_INVALID = 0,
+    CMP_MESSAGE_VALID,
+} cmp_message_status_e;
+
 typedef struct
 {
 	/**
@@ -43,6 +52,8 @@ typedef struct
 	    * @brief Целевой поворот
 	    */
 	__PFPT__ targetRotation;
+    
+    __PFPT__ targetMaxVal;
 
 	/**
 	    * @brief Максимальное значение, которое регулирует скорость и поворот
@@ -55,6 +66,13 @@ typedef struct
 	    * @brief Нулевое значение (равно половине от максимального значения)
 	    */
 	int16_t zeroValue;
+    
+    VTMR_tmr_s virtTmr;
+    
+    uint32_t maxTimeout;
+    
+    filt_complementary_s filtForTargetSpeed_s,
+            filtForTargetRotation_s;
 } cmp_control_data_s;
 /*#### |End  | <-- Секция - "Определение типов" ##############################*/
 
@@ -69,7 +87,7 @@ extern void
 CMP_init_struct(
 	cmp_control_data_s *data);
 
-extern void
+extern cmp_message_status_e
 CMP_parse_message(
 	cmp_control_data_s *data,
 	char *controlCmd);
