@@ -37,42 +37,42 @@
 /*#### |Begin| --> Секция - "Определение типов" ##############################*/
 typedef enum
 {
-    CMP_MESSAGE_INVALID = 0,
-    CMP_MESSAGE_VALID,
+	CMP_MESSAGE_INVALID = 0,
+	CMP_MESSAGE_VALID,
 } cmp_message_status_e;
 
 typedef struct
 {
 	/**
-	    * @brief Целевая скорость, которую нужно достичь
-	    */
+	 * @brief Целевая скорость, которую нужно достичь
+	 */
 	__PFPT__ targetSpeed;
 
 	/**
-	    * @brief Целевой поворот
-	    */
+	 * @brief Целевой поворот
+	 */
 	__PFPT__ targetRotation;
-    
-    __PFPT__ targetMaxVal;
+
+	__PFPT__ targetMaxVal;
 
 	/**
-	    * @brief Максимальное значение, которое регулирует скорость и поворот
-	    */
+	 * @brief Максимальное значение, которое регулирует скорость и поворот
+	 */
 	int16_t maxControlValue;
 
 	__PFPT__  discreteInc;
 
 	/**
-	    * @brief Нулевое значение (равно половине от максимального значения)
-	    */
+	 * @brief Нулевое значение (равно половине от максимального значения)
+	 */
 	int16_t zeroValue;
-    
-    VTMR_tmr_s virtTmr;
-    
-    uint32_t maxTimeout;
-    
-    filt_complementary_s filtForTargetSpeed_s,
-            filtForTargetRotation_s;
+
+	VTMR_tmr_s virtTmr;
+
+	uint32_t maxTimeout;
+
+	filt_complementary_s filtForTargetSpeed_s,
+						 filtForTargetRotation_s;
 } cmp_control_data_s;
 /*#### |End  | <-- Секция - "Определение типов" ##############################*/
 

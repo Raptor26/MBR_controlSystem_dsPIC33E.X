@@ -173,13 +173,13 @@ InitAllPeriphAndModules(
 
 	/*=== |Begin| --> Секция - "Конфигурирование периферии микроконтроллера" =*/
 	/* Инициализация тактового генератора */
-#if defined (__USE_FRC_FOR_FCY__)
+	#if defined (__USE_FRC_FOR_FCY__)
 	PIC_Init_Oscillator_FRC_8MHz_FOSC_128MHz_FCY_64MIPS();
-#elif defined (__USE_HS_16_MHz_FOR_FCY__)
+	#elif defined (__USE_HS_16_MHz_FOR_FCY__)
 	PIC_Init_Oscillator_HS_16MHz_FOSC_128MHz_FCY_64MIPS();
-#else
+	#else
 #error "Please, set source for system clock"
-#endif
+	#endif
 
 	/* Задержка чтобы успел проинициализироваться констроллер
 	 * векторного управления */
