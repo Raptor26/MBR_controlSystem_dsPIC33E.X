@@ -60,45 +60,50 @@ int main(
 		/* Определение угла наклона балансирующего робота по тангажу */
 		VTMR_StartTimer(
 			&compFiltRuntime_s);
-
 		__PFPT__ robotPitchAngle =
 			RPA_GetPitchAngle(
 				(__PFPT__*) &gyr_a[IISMPU_PITCH],
 				(__PFPT__) acc_a[IISMPU_ROLL],
 				(__PFPT__) acc_a[IISMPU_PITCH],
 				(__PFPT__) acc_a[IISMPU_YAW]);
-
 		VTMR_GetTimerValue(
 			&compFiltRuntime_s);
 
-
-		uint32_t testTime =
-			VTMR_GetTimerValue(
-				&RBS_balancingSystem_s.speedControl_s.control_data_s.virtTmr);
-
+		/* ================================================================== */
+		/* Если с момента обработки крайнего пакета данных для управления
+		 * прошло времени больше чем величина "TimeOut" */
 		if ((VTMR_GetTimerValue(
 					&RBS_balancingSystem_s.speedControl_s.control_data_s.virtTmr))
 				>= ((uint32_t)RBS_balancingSystem_s.speedControl_s.control_data_s.maxTimeout))
 		{
+			/* Сброс заданной скорости в нуль */
 			RBS_balancingSystem_s.speedControl_s.control_data_s.targetSpeed =
+				/* Комплементарный фильтр (используется для внесения задержки сигнала )*/
 				FILT_Complementary_fpt(
 					&RBS_balancingSystem_s.speedControl_s.control_data_s.filtForTargetSpeed_s,
 					(__PFPT__) 0.0);
+
+			/* Сброс заданной скорости вращения в нуль */
 			RBS_balancingSystem_s.speedControl_s.control_data_s.targetRotation =
+				/* Комплементарный фильтр (используется для внесения задержки сигнала )*/
 				FILT_Complementary_fpt(
 					&RBS_balancingSystem_s.speedControl_s.control_data_s.filtForTargetRotation_s,
 					(__PFPT__) 0.0);
 		}
+		/* ================================================================== */
 
+		/* Функция для получения управляющих воздействия для удержания робота 
+		 * в заданном положении */
 		__PFPT__ leftRightMotorControl =
 			RBS_GetControlForRobot(
 				&RBS_balancingSystem_s,
 				robotPitchAngle,
 				NULL);
-//				gyr_a[IISMPU_PITCH]);
 
 		if (DMA2CONbits.CHEN == 0)
 		{
+			/* Формирование и запуск передачи пакета данных для управления
+			 * электродвигателями */
 			LRMC_SendCmdForLeftRightMotors(
 				&LRMC_leftRightMotorControlPack_s,
 				(__VMCPC_F3M_FPT__) RBS_balancingSystem_s.motorControl_a[RBS_LEFT_MOTOR],
@@ -115,8 +120,10 @@ int main(
 					&RBS_balancingSystem_s.speedControl_s.control_data_s,
 					recievedControlCmd);
 
+			/* Если принятый пакет данных валиден */
 			if (messageStatus_e == CMP_MESSAGE_VALID)
 			{
+				/* Перезапуск виртуального таймера */
 				VTMR_StartTimer(
 					&RBS_balancingSystem_s.speedControl_s.control_data_s.virtTmr);
 			}
@@ -124,29 +131,13 @@ int main(
 			/* Забить память нулями */
 			memset((void*) recievedControlCmd, '\0', controlCmdSize);
 
-			int bytesCnt =
-				sprintf(
-					debugControlCmd,
-					"speed = %f\r\ndirect = %f",
-					RBS_balancingSystem_s.speedControl_s.control_data_s.targetSpeed,
-					RBS_balancingSystem_s.speedControl_s.control_data_s.targetRotation);
-
-//			UDI_StartForceUart3_DMA3_Transmit(
-//				(unsigned int*)debugControlCmd,
-//				(unsigned int) bytesCnt);
-
-			/* Запусить DMA на прием данных */
-//            UDI_StartForceUart3_DMA4_Receiver(
-//				(unsigned int*)recievedControlCmd,
-//				controlCmdSize);
+			// int bytesCnt =
+			// 	sprintf(
+			// 		debugControlCmd,
+			// 		"speed = %f\r\ndirect = %f",
+			// 		RBS_balancingSystem_s.speedControl_s.control_data_s.targetSpeed,
+			// 		RBS_balancingSystem_s.speedControl_s.control_data_s.targetRotation);
 		}
-
-//		if (DMA4CONbits.CHEN == 0 && U3STAbits.RIDLE == 1)
-//		{
-//			UDI_StartForceUart3_DMA4_Receiver(
-//				(unsigned int*)recievedControlCmd,
-//				controlCmdSize);
-//		}
 
 		/* ################ Отладочная информация ####################### */
 		/* Формирование отладочного пакета данных */
@@ -181,7 +172,7 @@ InitAllPeriphAndModules(
 #error "Please, set source for system clock"
 	#endif
 
-	/* Задержка чтобы успел проинициализироваться констроллер
+	/* Задержка чтобы успел проинициализироваться контроллер
 	 * векторного управления */
 	__delay_ms(100u);
 
