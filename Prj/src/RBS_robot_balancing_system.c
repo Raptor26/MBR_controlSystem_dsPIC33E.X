@@ -68,8 +68,8 @@ RBS_GetControlForRobot(
 	__PFPT__ pitchAngle,
 	__PFPT__ pitchAngularSpeed)
 {
-	if ((p_s->startSystem_flag == 0u) 
-	&& (__RBS_fabs(pitchAngle) < (__PFPT__) 0.01))
+	if ((p_s->startSystem_flag == 0u)
+			&& (__RBS_fabs(pitchAngle) < (__PFPT__) 0.01))
 	{
 		p_s->startSystem_flag = 1u;
 	}
@@ -105,6 +105,12 @@ RBS_GetControlForRobot(
 			pitchAngularSpeed);
 
 		/* Расчет управления для вращения по азимуту */
+
+//        p_s->motorControl_a[RBS_LEFT_MOTOR] = 0.0;
+//        p_s->motorControl_a[RBS_RIGHT_MOTOR] = 0.0;
+
+		p_s->motorControl_a[RBS_LEFT_MOTOR] += p_s->speedControl_s.control_data_s.targetRotation;
+		p_s->motorControl_a[RBS_RIGHT_MOTOR] -= p_s->speedControl_s.control_data_s.targetRotation;
 	}
 
 	return (p_s->motorControl);
@@ -143,7 +149,7 @@ RBS_GetDesiredAngle(
 			&pSpeedControl_s->piRegulator_s,
 			error,
 			NULL);
-	
+
 	return (desiredAngle);
 }
 
@@ -195,7 +201,7 @@ RBS_Init_PD_ForRetentionDesiredPitchAngle(
 
 	/* Коэффициент пропорциональной составляющей регулятора */
 	pidInit_s.kP =
-		(__REGUL_FPT__) 50.0;
+		(__REGUL_FPT__) 40.0;
 
 	/* Коэффициент интегральной составляющей регулятора */
 	pidInit_s.kI =
@@ -203,7 +209,7 @@ RBS_Init_PD_ForRetentionDesiredPitchAngle(
 
 	/* Коэффициент дифференциальной составляющей регулятора */
 	pidInit_s.kD =
-		(__REGUL_FPT__) 0.20;
+		(__REGUL_FPT__) 0.15;
 
 	/* Значение насыщения интегральной составляющей */
 	pidInit_s.integralValSaturation =
@@ -247,11 +253,10 @@ RBS_Init_KI_ForFormationDesiredPitchAngle(
 
 	/* Значение насыщения интегральной составляющей */
 	pidInit_s.integralValSaturation =
-		(__REGUL_FPT__) RBS_45DEG_IN_RAD * 0.5;
-
+		(__REGUL_FPT__) RBS_45DEG_IN_RAD * 0.2;
 	/* Значение насыщения выходной величины регулятора */
 	pidInit_s.returnValSaturation =
-		(__REGUL_FPT__) RBS_45DEG_IN_RAD * 0.5;
+		(__REGUL_FPT__) RBS_45DEG_IN_RAD * 0.6;
 
 	/* Инициализация структуры регулятора */
 	REGUL_Init_PID(

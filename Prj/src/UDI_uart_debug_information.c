@@ -139,10 +139,10 @@ UDI_StartForceUart3_DMA4_Receiver(
 	/* Отключение канала DMA */
 	DMA4CONbits.CHEN = 0;
 
-	unsigned int trash = U3RXREG;
-	trash = U3RXREG;
-	trash = U3RXREG;
-	trash = U3RXREG;
+//	unsigned int trash = U3RXREG;
+//	trash = U3RXREG;
+//	trash = U3RXREG;
+//	trash = U3RXREG;
 
 	/* Сброс флага Overrun модуля UART */
 	U4STAbits.OERR = 0;
@@ -257,24 +257,24 @@ UDI_Init_DMA3_For_Uart3Tx(
 void
 UDI_Init_DMA4_For_Uart3Rx(void)
 {
-		DMA4CONbits.AMODE = 0; //	Configure DMA for Register Indirect mode
+	DMA4CONbits.AMODE = 0; //	Configure DMA for Register Indirect mode
 //								with post-increment
-		DMA4CONbits.SIZE = 1;
-		DMA4CONbits.MODE = 1;
-		DMA4CONbits.DIR = 0; // RAM-to-Peripheral data receive
-		DMA4CNT = 0;
+	DMA4CONbits.SIZE = 1;
+	DMA4CONbits.MODE = 1;
+	DMA4CONbits.DIR = 0; // RAM-to-Peripheral data receive
+	DMA4CNT = 0;
 //	DMA4REQ = 0x0058; // Select UART3 Receiver
-		DMA4PAD = (volatile unsigned int) &U3RXREG;
-		DMA4STAL = 0x0000;
-		DMA4STAH = 0x0000;
-		DMA4STBL = 0x0000;
-		DMA4STBH = 0x0000;
+	DMA4PAD = (volatile unsigned int) &U3RXREG;
+	DMA4STAL = 0x0000;
+	DMA4STAH = 0x0000;
+	DMA4STBL = 0x0000;
+	DMA4STBH = 0x0000;
 
-		/*  UART3RX – UART3 Receiver */
-		DMA4REQbits.IRQSEL = 0b01010010;
+	/*  UART3RX – UART3 Receiver */
+	DMA4REQbits.IRQSEL = 0b01010010;
 
-		IFS2bits.DMA4IF = 0; // Clear DMA Interrupt Flag
-		IEC2bits.DMA4IE = 1; // Enable DMA Interrupt
+	IFS2bits.DMA4IF = 0; // Clear DMA Interrupt Flag
+	IEC2bits.DMA4IE = 1; // Enable DMA Interrupt
 }
 
 
@@ -291,6 +291,26 @@ _U3RXInterrupt (void)
 {
 	// Сброс флага прерывания;
 	IFS5bits.U3RXIF = 0;
+	static size_t buffPoint = 0;
+	int temp = U3RXREG;
+	if (temp == 'S')
+	{
+		buffPoint = 0;
+		recievedControlCmd[buffPoint] = temp;
+//		UDI_StartForceUart3_DMA4_Receiver(
+//			(unsigned int*) &recievedControlCmd[1],
+//			13);
+	}
+	else if (buffPoint != 0)
+	{
+		recievedControlCmd[buffPoint] = temp;
+	}
+	buffPoint++;
+	if (buffPoint >= controlCmdSize)
+	{
+		CMP_receiveMessage_flag++;
+		buffPoint = 0;
+	}
 }
 
 void __attribute__ ((__interrupt__, auto_psv))
@@ -311,8 +331,13 @@ _DMA4Interrupt (void)
 
 	/* Отключение канала DMA */
 	DMA4CONbits.CHEN = 0;
-    
-    CMP_receiveMessage_flag++;
+
+//    unsigned int trash = U3RXREG;
+//	trash = U3RXREG;
+//	trash = U3RXREG;
+//	trash = U3RXREG;
+
+	CMP_receiveMessage_flag++;
 }
 /* Написать обработчик прерывания */
 /*#### |End  | <-- Секция - "Описание глобальных функций" ####################*/
