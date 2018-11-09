@@ -20,6 +20,7 @@
 /*==== |End  | <-- Секция - "MK peripheral libraries" ========================*/
 
 /*==== |Begin| --> Секция - "Extern libraries" ===============================*/
+#include "../inc/CMP_control_message_parser.h"
 #include "../inc/RPA_robot_pitch_angle.h"
 #include "../../Lib_A_REGUL_regulators/Lib_A_REGUL_regulators.h"
 #include "../../Lib_A_FILT_filters.c/Lib_A_FILT_filters.h"
@@ -55,12 +56,7 @@ typedef enum
 } rbs_left_right_motors_e;
 
 typedef struct
-{
-	/**
-	    * @brief Целевая скорость, которую нужно достичь
-	    */
-	__PFPT__ target;
-
+{    
 	/**
 	 * @brief Текущая скорость
 	 */
@@ -77,6 +73,11 @@ typedef struct
 	filt_complementary_s compFilt_s;
 
 	regul_pid_s piRegulator_s;
+    
+	/**
+	 * @brief Структура с целевой скоростью и поворотом
+	 */
+	cmp_control_data_s control_data_s;
 } rbs_speed_control_s;
 
 typedef struct

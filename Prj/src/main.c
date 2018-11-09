@@ -18,13 +18,14 @@ float acc_a[IISMPU_VECT_SIZE];
 float gyr_a[IISMPU_VECT_SIZE];
 float mpuTemperature;
 double testDouble = 5.0;
-
-char testMessage_a[] = "Hello World.\r\n";
 /*#### |End  | <-- Секция - "Глобальные переменные" ##########################*/
 
 
 /*#### |Begin| --> Секция - "Локальные переменные" ###########################*/
+char recievedControlCmd[7];
+unsigned int controlCmdSize = sizeof (recievedControlCmd);
 VTMR_tmr_s compFiltRuntime_s;
+cmp_control_data_s controlRobot_s;
 /*#### |End  | <-- Секция - "Локальные переменные" ###########################*/
 
 
@@ -85,10 +86,35 @@ int main(
 				(__VMCPC_F3M_FPT__) RBS_balancingSystem_s.motorControl_a[RBS_RIGHT_MOTOR]);
 		}
 
+		if (CMP_receiveMessage_flag != 0 && DMA4CONbits.CHEN == 0)
+		{
+			CMP_receiveMessage_flag = 0;
+
+			/* Обработать принятый пакет */
+			CMP_parse_message(
+				&RBS_balancingSystem_s.speedControl_s.control_data_s,
+				recievedControlCmd);
+
+			/* Забить память нулями */
+			memset((void*) recievedControlCmd, '\0', controlCmdSize);
+
+//			/* Запусить DMA на прием данных */
+//			UDI_StartForceUart3_DMA4_Receiver(
+//				(unsigned int*)recievedControlCmd,
+//				controlCmdSize);
+		}
+
+		if (DMA4CONbits.CHEN == 0 && U3STAbits.RIDLE == 1)
+		{
+			UDI_StartForceUart3_DMA4_Receiver(
+				(unsigned int*)recievedControlCmd,
+				controlCmdSize);
+		}
+
 		/* ################ Отладочная информация ####################### */
 		/* Формирование отладочного пакета данных */
-		UDI_GetAndSendDebugPackForSerialPlot(
-			&UDI_serialPlotDataPackage_s);
+//		UDI_GetAndSendDebugPackForSerialPlot(
+//			&UDI_serialPlotDataPackage_s);
 		/* ############################################################## */
 
 		PTWT_ProgTactEndLoop(
@@ -117,18 +143,27 @@ InitAllPeriphAndModules(
 #else
 #error "Please, set source for system clock"
 #endif
-	
-	/* Задержка чтобы успел проинициализироваться констроллер 
+
+	/* Задержка чтобы успел проинициализироваться констроллер
 	 * векторного управления */
 	__delay_ms(100u);
-	
+
 	/* Инициализация светодиодов платы */
 	BLEDS_Init_AllLeds();
 
 	/* Инициализация UART модуля для передачи отладочной информации */
 	UDI_Init_All_UART3_RxTx_With_DMA_Tx(
 		(unsigned int long) FCY,
-		(unsigned int long) 660000UL);
+		(unsigned int long) 9600UL);
+
+//    Конфигурация Bluetooth модуля:
+//    AT+NAME=NCFU
+//    AT+PSWD="NCFU9999"
+//    AT+UART=460800,0,0
+
+	UDI_StartForceUart3_DMA4_Receiver(
+		(unsigned int*)recievedControlCmd,
+		controlCmdSize);
 
 	/* Инициализация аппаратного таймера для тактирования цикла while(1) */
 	HPT_Init_TMR9ForProgTact_PTWTLibrary(
@@ -154,9 +189,12 @@ InitAllPeriphAndModules(
 
 	RPA_Init_DataForCalcPitchAngle();
 
+	CMP_init_struct(
+		&RBS_balancingSystem_s.speedControl_s.control_data_s);
+
 	RBS_Init_BalancingSystem(
 		&RBS_balancingSystem_s);
-		
+
 	/* Разрешение глобальных прерываний */
 	_GIE = 1;
 }

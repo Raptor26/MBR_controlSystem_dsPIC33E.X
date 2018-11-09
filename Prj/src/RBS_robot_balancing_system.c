@@ -82,7 +82,6 @@ RBS_GetControlForRobot(
 		p_s->motorControl_a[RBS_RIGHT_MOTOR]	= (__PFPT__) 0.0;
 		p_s->speedControl_s.currSpeed			= (__PFPT__) 0.0;
 		p_s->speedControl_s.currSpeedFilt		= (__PFPT__) 0.0;
-		p_s->speedControl_s.target				= (__PFPT__) 0.0;
 		p_s->speedControl_s.piRegulator_s.integral_s.val = (__PFPT__) 0.0;
 		p_s->startSystem_flag = 0u;
 	}
@@ -126,7 +125,7 @@ RBS_GetDesiredAngle(
 
 	/* Ошибка скорости*/
 	__PFPT__ error =
-		-pSpeedControl_s->target + pSpeedControl_s->currSpeedFilt;
+		-pSpeedControl_s->control_data_s.targetSpeed + pSpeedControl_s->currSpeedFilt;
 
 	pSpeedControl_s->piRegulator_s.proportional_s.kP = -(((__RBS_fabs(error)) * 9.01f) + 0.05);
 //	pSpeedControl_s->piRegulator_s.integral_s.kI =
