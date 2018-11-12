@@ -74,6 +74,8 @@ typedef struct
 
 	regul_pid_s piRegulator_s;
     
+    regul_pid_s dRegulator_s;
+    
 	/**
 	 * @brief Структура с целевой скоростью и поворотом
 	 */
