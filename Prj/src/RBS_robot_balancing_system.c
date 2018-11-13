@@ -64,6 +64,8 @@ RBS_Init_BalancingSystem(
 		&p_s->speedControl_s.dRegulator_s);
 
 	p_s->speedControl_s.compFilt_s.filtCoeff = 0.984;
+	
+	p_s->speedControl_s.compFilt_balancedAngle_s.filtCoeff = 0.999;
 
 	p_s->desiredAngle = (__PFPT__) 0.0;
 
@@ -77,13 +79,13 @@ RBS_GetControlForRobot(
 	__PFPT__ pitchAngularSpeed)
 {
 	if ((p_s->startSystem_flag == 0u)
-			&& (__RBS_fabs(pitchAngle) < (__PFPT__) 0.01))
+			&& (__RBS_fabs((__RBS_fabs(p_s->speedControl_s.balancedAngle) - __RBS_fabs(pitchAngle))) < (__PFPT__) 0.01))
 	{
 		p_s->startSystem_flag = 1u;
 	}
 	/* Если угол наклона больше некого значения по модулю, то необходимо
 	 * управляющее воздействие установить в нуль */
-	if (__RBS_fabs(pitchAngle) > (__PFPT__) 1.3)
+	if (__RBS_fabs(pitchAngle) > (__PFPT__) 1.5)
 	{
 		p_s->motorControl						= (__PFPT__) 0.0;
 		p_s->motorControl_a[RBS_LEFT_MOTOR]	= (__PFPT__) 0.0;
@@ -91,6 +93,7 @@ RBS_GetControlForRobot(
 		p_s->speedControl_s.currSpeed			= (__PFPT__) 0.0;
 		p_s->speedControl_s.currSpeedFilt		= (__PFPT__) 0.0;
 		p_s->speedControl_s.piRegulator_s.integral_s.val = (__PFPT__) 0.0;
+		p_s->speedControl_s.piRegulator_s.integral_s.kI = (__PFPT__) 0.0;
 		p_s->startSystem_flag = 0u;
 	}
 	/* Иначе, штатный режим работы */
@@ -112,7 +115,7 @@ RBS_GetControlForRobot(
 			p_s,
 			pitchAngle,
 			pitchAngularSpeed);
-
+		
 		/* Расчет управления для вращения по азимуту */
 
 //        p_s->motorControl_a[RBS_LEFT_MOTOR] = 0.0;
@@ -157,9 +160,9 @@ RBS_GetDesiredAngle(
 	{
 		
 		pSpeedControl_s->piRegulator_s.integral_s.kI += 0.006;
-		if (pSpeedControl_s->piRegulator_s.integral_s.kI > 4.5)
+		if (pSpeedControl_s->piRegulator_s.integral_s.kI > 1.5)
 		{
-			pSpeedControl_s->piRegulator_s.integral_s.kI = 4.5;
+			pSpeedControl_s->piRegulator_s.integral_s.kI = 1.5;
 		}
 			
 	}
@@ -178,6 +181,20 @@ RBS_GetDesiredAngle(
 			&pSpeedControl_s->piRegulator_s,
 			error,
 			NULL);
+
+	if (error < 0.02)
+	{
+		pSpeedControl_s->balancedAngle = 
+			FILT_Complementary_fpt(
+			&pSpeedControl_s->compFilt_balancedAngle_s,
+			pitchAngle);
+		
+		/* Корректировака ограничения насыщения ПИ регулятора */
+		pSpeedControl_s->piRegulator_s.pidValSatur = 
+			RBS_MAX_ANGLE_RAD + pSpeedControl_s->balancedAngle;
+		pSpeedControl_s->piRegulator_s.integral_s.satur = 
+			RBS_MAX_ANGLE_RAD + pSpeedControl_s->balancedAngle;
+	}
 	
 //	desiredAngle += REGUL_Get_PID(
 //		&pSpeedControl_s->dRegulator_s, 
@@ -287,11 +304,11 @@ RBS_Init_KI_ForFormationDesiredPitchAngle(
 
 	/* Значение насыщения интегральной составляющей */
 	pidInit_s.integralValSaturation =
-		(__REGUL_FPT__) RBS_45DEG_IN_RAD * 0.8;
+		(__REGUL_FPT__) RBS_MAX_ANGLE_RAD;
 	
 	/* Значение насыщения выходной величины регулятора */
 	pidInit_s.returnValSaturation =
-		(__REGUL_FPT__) RBS_45DEG_IN_RAD * 0.8;
+		(__REGUL_FPT__) RBS_MAX_ANGLE_RAD;
 
 	/* Инициализация структуры регулятора */
 	REGUL_Init_PID(
