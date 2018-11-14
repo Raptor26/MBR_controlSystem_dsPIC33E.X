@@ -72,7 +72,7 @@ RBS_Init_BalancingSystem(
 
 	p_s->speedControl_s.compFilt_s.filtCoeff = 0.984;
 
-	p_s->speedControl_s.compFilt_balancedAngle_s.filtCoeff = 0.999;
+	p_s->speedControl_s.compFilt_balancedAngle_s.filtCoeff = 0.99999;
 
 	p_s->desiredAngle = (__PFPT__) 0.0;
 
@@ -165,31 +165,64 @@ RBS_GetDesiredAngle(
 
 	if (__RBS_fabs (error) > 0.1)
 	{
-
-		pSpeedControl_s->piRegulator_s.integral_s.kI += 0.006;
-		if (pSpeedControl_s->piRegulator_s.integral_s.kI > 1.5)
-		{
-			pSpeedControl_s->piRegulator_s.integral_s.kI = 1.5;
-		}
+		static filt_complementary_s integralCoeffFilt_s;
+		integralCoeffFilt_s.filtCoeff = 0.9995;
+		pSpeedControl_s->piRegulator_s.integral_s.kI =
+			FILT_Complementary_fpt(&integralCoeffFilt_s, (__PFPT__) 4.5);
+//		pSpeedControl_s->piRegulator_s.integral_s.kI += 0.006;
+//		if (pSpeedControl_s->piRegulator_s.integral_s.kI > 4.5)
+//		{
+//			pSpeedControl_s->piRegulator_s.integral_s.kI = 4.5;
+//		}
 
 	}
 	else
 	{
-		pSpeedControl_s->piRegulator_s.integral_s.kI -= 0.008;
-		if (pSpeedControl_s->piRegulator_s.integral_s.kI < 0.0)
-		{
-			pSpeedControl_s->piRegulator_s.integral_s.kI = 0.0;
-		}
+		static filt_complementary_s integralCoeffFilt_s;
+		integralCoeffFilt_s.filtCoeff = 0.999995;
+		pSpeedControl_s->piRegulator_s.integral_s.kI =
+			FILT_Complementary_fpt(&integralCoeffFilt_s, (__PFPT__) 0.0);
+//		pSpeedControl_s->piRegulator_s.integral_s.kI -= 0.008;
+//		if (pSpeedControl_s->piRegulator_s.integral_s.kI < 0.0)
+//		{
+//			pSpeedControl_s->piRegulator_s.integral_s.kI = 0.0;
+//		}
 	}
 
-	/* Формирование заданного угла наклона */
-	__PFPT__ desiredAngle =
+	__PFPT__ desiredAngle = 0.0;
+
+		/* Формирование заданного угла наклона */
+	desiredAngle =
 		REGUL_Get_PID(
 			&pSpeedControl_s->piRegulator_s,
 			error,
 			NULL);
+	
+	if (__RBS_fabs (error) < 0.01)
+	{
+//		static filt_complementary_s balanceAngleFilt_s;
+//		balanceAngleFilt_s.filtCoeff = 0.99;
+//		
+//		__PFPT__ desiredAngleError = desiredAngle - pSpeedControl_s->balancedAngle;
+//		desiredAngle =
+//			FILT_Complementary_fpt(&balanceAngleFilt_s, desiredAngleError);
+//
+//		static filt_complementary_s integralValFilt_s;
+//		integralValFilt_s.filtCoeff = 0.99999999;
+//		pSpeedControl_s->piRegulator_s.integral_s.val =
+//			FILT_Complementary_fpt(&integralValFilt_s, 0.0);
 
-	if (error < 0.02)
+//		static filt_complementary_s integralCoeffFilt_s;
+//		integralCoeffFilt_s.filtCoeff = 0.9;
+//		pSpeedControl_s->piRegulator_s.integral_s.kI =
+//			FILT_Complementary_fpt(&integralCoeffFilt_s, (__PFPT__) 0.0);
+	}
+	
+
+
+
+
+	if (__RBS_fabs(error) < 0.02)
 	{
 		pSpeedControl_s->balancedAngle =
 			FILT_Complementary_fpt(
@@ -224,18 +257,18 @@ RBS_GetControlForBalance(
 		pitchAngle - p_s->desiredAngle;
 
 	/* Получить управляющее воздействие для балансирования */
-//	p_s->motorControl =
-//		REGUL_Get_PID(
-//			&p_s->pdForBalance_s,
-//			error,
-//			pitchAngularSpeed);
-
 	p_s->motorControl =
-		REGUL_IBSC(
-			&p_s->ibscForBalance_s,
+		REGUL_Get_PID(
+			&p_s->pdForBalance_s,
 			error,
-			p_s->desiredAngle,
-			pitchAngularSpeed);
+			NULL);
+
+//	p_s->motorControl =
+//		REGUL_IBSC(
+//			&p_s->ibscForBalance_s,
+//			error,
+//			p_s->desiredAngle,
+//			pitchAngularSpeed);
 
 	/* Копирование найденного значения управляющего воздействия в переменные
 	 * для правого и лового моторов */
@@ -252,9 +285,9 @@ RBS_Init_IBSCForRetentionDesiredPitchAngle(
 {
 	regul_ibsc_init_s ibscInit_s;
 	REGUL_IBSC_StructInit(&ibscInit_s);
-	ibscInit_s.coeff_s.b1		= (__REGUL_FPT__) 1.0;
-	ibscInit_s.coeff_s.c1		= (__REGUL_FPT__) 1.0;
-	ibscInit_s.coeff_s.c2		= (__REGUL_FPT__) 1.0;
+	ibscInit_s.coeff_s.b1		= (__REGUL_FPT__) 2.0;
+	ibscInit_s.coeff_s.c1		= (__REGUL_FPT__) 0.05;
+	ibscInit_s.coeff_s.c2		= (__REGUL_FPT__) 0.05;
 	ibscInit_s.coeff_s.lambda	= (__REGUL_FPT__) 0.0;
 
 	ibscInit_s.dT			= (__REGUL_FPT__) INTEGRATE_PERIOD_IN_SEC;
