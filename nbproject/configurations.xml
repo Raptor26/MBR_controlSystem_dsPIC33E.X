@@ -61,6 +61,8 @@
                    projectFiles="true">
       <itemPath>Lib_A_REGUL_regulators/Lib_A_REGUL_regulators.c</itemPath>
       <itemPath>Lib_A_REGUL_regulators/Lib_A_REGUL_regulators.h</itemPath>
+      <itemPath>Lib_A_REGUL_regulators/Lib_A_REGUL_IBSC_regulator.c</itemPath>
+      <itemPath>Lib_A_REGUL_regulators/Lib_A_REGUL_IBSC_regulator.h</itemPath>
     </logicalFolder>
     <logicalFolder name="f8"
                    displayName="Lib_A_RGBF_ring_buffer"
