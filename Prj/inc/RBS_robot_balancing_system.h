@@ -25,6 +25,7 @@
 #include "../../Lib_A_REGUL_regulators/Lib_A_REGUL_regulators.h"
 #include "../../Lib_A_FILT_filters.c/Lib_A_FILT_filters.h"
 #include "main.h"
+#include "../../Lib_A_REGUL_regulators/Lib_A_REGUL_IBSC_regulator.h"
 /*==== |End  | <-- Секция - "Extern libraries" ===============================*/
 /*#### |End  | <-- Секция - "Include" ########################################*/
 
@@ -91,6 +92,9 @@ typedef struct
 typedef struct
 {
 	regul_pid_s pdForBalance_s;
+    
+    regul_ibsc_s ibscForBalance_s;
+    
 	__PFPT__ motorControl_a[RBS_MOTOR_NUMB];
 	__PFPT__ motorControl;
 	__PFPT__ desiredAngle;
