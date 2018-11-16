@@ -48,7 +48,7 @@
 #define RBS_90DEG_IN_RAD      ((__PFPT__)((3.14159265)*0.5))
 #define RBS_45DEG_IN_RAD      ((RBS_90DEG_IN_RAD * ((__PFPT__)0.5)))
 #define RBS_30DEG_IN_RAD      ((RBS_90DEG_IN_RAD) * ((__PFPT__)0.33333333))
-#define RBS_MAX_ANGLE_RAD     (RBS_45DEG_IN_RAD * 1.2)
+#define RBS_MAX_ANGLE_RAD     (RBS_45DEG_IN_RAD * 0.9)
 typedef enum
 {
 	RBS_LEFT_MOTOR = 0,

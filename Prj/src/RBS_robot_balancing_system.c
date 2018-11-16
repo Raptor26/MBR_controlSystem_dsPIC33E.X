@@ -149,92 +149,110 @@ RBS_GetDesiredAngle(
 			&pSpeedControl_s->compFilt_s,
 			pSpeedControl_s->currSpeed);
 
+
 	/* Ошибка скорости*/
 	__PFPT__ error =
-		(pSpeedControl_s->control_data_s.targetSpeed * 1.0) - (pSpeedControl_s->currSpeedFilt);
+		(pSpeedControl_s->control_data_s.targetSpeed * (1.0 - (__RBS_fabs(pitchAngle) * 1.9)) ) - (pSpeedControl_s->currSpeedFilt);
 
-	pSpeedControl_s->piRegulator_s.proportional_s.kP = (((__RBS_fabs(error)) * 0.3f) + 0.001);
-//	pSpeedControl_s->piRegulator_s.integral_s.kI =
-//		pSpeedControl_s->piRegulator_s.proportional_s.kP * 1.0f;
+//	if (pSpeedControl_s->control_data_s.targetSpeed != (__PFPT__) 0.0)
+//	{
+//	static filt_complementary_s filtTargetSpeed_s;
+//	filtTargetSpeed_s.filtCoeff = 0.99;
+//	pSpeedControl_s->control_data_s.targetSpeed  =
+//		FILT_Complementary_fpt(
+//			&filtTargetSpeed_s,
+//			pSpeedControl_s->control_data_s.targetSpeed * (1.0 - __RBS_fabs(error)));
+//	}
+	__PFPT__ desiredAngle = 0.0;
 
-	if (fabsf(pSpeedControl_s->piRegulator_s.proportional_s.kP) > 0.01)
-	{
-		pSpeedControl_s->piRegulator_s.proportional_s.kP = 0.01;
-	}
-
+//	static filt_complementary_s filtPidSatur_s;
+//	filtPidSatur_s.filtCoeff = 0.99999;
+//	pSpeedControl_s->piRegulator_s.pidValSatur =
+//		FILT_Complementary_fpt(
+//			&filtPidSatur_s,
+//			RBS_MAX_ANGLE_RAD  - (__RBS_fabs(error) * ((__PFPT__)1.0)));
+//
+//	static filt_complementary_s filtPidIntegSatur_s;
+//	filtPidIntegSatur_s.filtCoeff = 0.99999;
+//	pSpeedControl_s->piRegulator_s.integral_s.satur =
+//		FILT_Complementary_fpt(
+//			&filtPidIntegSatur_s,
+//			RBS_MAX_ANGLE_RAD - (__RBS_fabs(error) * ((__PFPT__)1.0)));
+	
+	static filt_complementary_s filtError_s;
+	filtError_s.filtCoeff = 0.3;
+	/* Формирование заданного угла наклона */
+	desiredAngle =
+		REGUL_Get_PID(
+			&pSpeedControl_s->piRegulator_s,
+			FILT_Complementary_fpt(
+				&filtError_s,
+				error),
+			NULL);
 
 	if (__RBS_fabs (error) > 0.1)
 	{
-		static filt_complementary_s integralCoeffFilt_s;
-		integralCoeffFilt_s.filtCoeff = 0.9995;
-		pSpeedControl_s->piRegulator_s.integral_s.kI =
-			FILT_Complementary_fpt(&integralCoeffFilt_s, (__PFPT__) 4.5);
-//		pSpeedControl_s->piRegulator_s.integral_s.kI += 0.006;
-//		if (pSpeedControl_s->piRegulator_s.integral_s.kI > 4.5)
-//		{
-//			pSpeedControl_s->piRegulator_s.integral_s.kI = 4.5;
-//		}
+//		static filt_complementary_s integralCoeffFilt_s;
+//		integralCoeffFilt_s.filtCoeff = 0.9997;
+//		pSpeedControl_s->piRegulator_s.integral_s.kI =
+//			FILT_Complementary_fpt(&integralCoeffFilt_s, (__PFPT__) 4.5);
+		pSpeedControl_s->piRegulator_s.integral_s.kI += 0.009;
+		if (pSpeedControl_s->piRegulator_s.integral_s.kI > 4.5)
+		{
+			pSpeedControl_s->piRegulator_s.integral_s.kI = 4.5;
+		}
 
 	}
 	else
 	{
-		static filt_complementary_s integralCoeffFilt_s;
-		integralCoeffFilt_s.filtCoeff = 0.999995;
-		pSpeedControl_s->piRegulator_s.integral_s.kI =
-			FILT_Complementary_fpt(&integralCoeffFilt_s, (__PFPT__) 0.0);
-//		pSpeedControl_s->piRegulator_s.integral_s.kI -= 0.008;
-//		if (pSpeedControl_s->piRegulator_s.integral_s.kI < 0.0)
-//		{
-//			pSpeedControl_s->piRegulator_s.integral_s.kI = 0.0;
-//		}
-	}
-
-	__PFPT__ desiredAngle = 0.0;
-
-		/* Формирование заданного угла наклона */
-	desiredAngle =
-		REGUL_Get_PID(
-			&pSpeedControl_s->piRegulator_s,
-			error,
-			NULL);
-	
-	if (__RBS_fabs (error) < 0.01)
-	{
-//		static filt_complementary_s balanceAngleFilt_s;
-//		balanceAngleFilt_s.filtCoeff = 0.99;
-//		
-//		__PFPT__ desiredAngleError = desiredAngle - pSpeedControl_s->balancedAngle;
-//		desiredAngle =
-//			FILT_Complementary_fpt(&balanceAngleFilt_s, desiredAngleError);
-//
-//		static filt_complementary_s integralValFilt_s;
-//		integralValFilt_s.filtCoeff = 0.99999999;
-//		pSpeedControl_s->piRegulator_s.integral_s.val =
-//			FILT_Complementary_fpt(&integralValFilt_s, 0.0);
-
 //		static filt_complementary_s integralCoeffFilt_s;
-//		integralCoeffFilt_s.filtCoeff = 0.9;
+//		integralCoeffFilt_s.filtCoeff = 0.99999;
 //		pSpeedControl_s->piRegulator_s.integral_s.kI =
 //			FILT_Complementary_fpt(&integralCoeffFilt_s, (__PFPT__) 0.0);
+//
+//		static filt_complementary_s balanceAngleFilt_s;
+//		balanceAngleFilt_s.filtCoeff = 0.1;
+
+//		pSpeedControl_s->piRegulator_s.integral_s.val -=
+//			FILT_Complementary_fpt(&balanceAngleFilt_s, (__PFPT__) 0.0);
+
+//		if (pSpeedControl_s->piRegulator_s.integral_s.val > 0.01)
+//		{
+//			pSpeedControl_s->piRegulator_s.integral_s.val -= 0.0003;
+//		}
+//		else if(pSpeedControl_s->piRegulator_s.integral_s.val < -0.01)
+//		{
+//			pSpeedControl_s->piRegulator_s.integral_s.val += 0.0003;
+//		}
+
+		pSpeedControl_s->piRegulator_s.integral_s.kI -= 0.008;
+		if (pSpeedControl_s->piRegulator_s.integral_s.kI < 0.0)
+		{
+			pSpeedControl_s->piRegulator_s.integral_s.kI = 0.0;
+		}
 	}
-	
 
-
-
-
-	if (__RBS_fabs(error) < 0.02)
+	if (pSpeedControl_s->control_data_s.targetRotation > 0.0)
 	{
-		pSpeedControl_s->balancedAngle =
-			FILT_Complementary_fpt(
-				&pSpeedControl_s->compFilt_balancedAngle_s,
-				pitchAngle);
-
-		/* Корректировака ограничения насыщения ПИ регулятора */
-		pSpeedControl_s->piRegulator_s.pidValSatur =
-			RBS_MAX_ANGLE_RAD + pSpeedControl_s->balancedAngle;
-		pSpeedControl_s->piRegulator_s.integral_s.satur =
-			RBS_MAX_ANGLE_RAD + pSpeedControl_s->balancedAngle;
+		pSpeedControl_s->control_data_s.targetRotation -= __RBS_fabs (error) * 0.19;
 	}
+	else if (pSpeedControl_s->control_data_s.targetRotation < 0.0)
+	{
+		pSpeedControl_s->control_data_s.targetRotation += __RBS_fabs (error) * 0.19;
+	}
+//	if (__RBS_fabs(error) < 0.02)
+//	{
+//		pSpeedControl_s->balancedAngle =
+//			FILT_Complementary_fpt(
+//				&pSpeedControl_s->compFilt_balancedAngle_s,
+//				pitchAngle);
+//
+//		/* Корректировака ограничения насыщения ПИ регулятора */
+//		pSpeedControl_s->piRegulator_s.pidValSatur =
+//			RBS_MAX_ANGLE_RAD + pSpeedControl_s->balancedAngle;
+//		pSpeedControl_s->piRegulator_s.integral_s.satur =
+//			RBS_MAX_ANGLE_RAD + pSpeedControl_s->balancedAngle;
+//	}
 
 //	desiredAngle += REGUL_Get_PID(
 //		&pSpeedControl_s->dRegulator_s,
@@ -362,7 +380,7 @@ RBS_Init_KI_ForFormationDesiredPitchAngle(
 
 	/* Коэффициент пропорциональной составляющей регулятора */
 	pidInit_s.kP =
-		(__REGUL_FPT__)  0.0005;
+		(__REGUL_FPT__)  0.01;
 
 	/* Коэффициент интегральной составляющей регулятора */
 	pidInit_s.kI =
