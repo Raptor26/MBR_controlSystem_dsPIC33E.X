@@ -25,6 +25,7 @@
 #include "../../Lib_A_REGUL_regulators/Lib_A_REGUL_regulators.h"
 #include "../../Lib_A_FILT_filters.c/Lib_A_FILT_filters.h"
 #include "main.h"
+#include "../../Lib_A_REGUL_regulators/Lib_A_REGUL_IBSC_regulator.h"
 /*==== |End  | <-- Секция - "Extern libraries" ===============================*/
 /*#### |End  | <-- Секция - "Include" ########################################*/
 
@@ -47,7 +48,7 @@
 #define RBS_90DEG_IN_RAD      ((__PFPT__)((3.14159265)*0.5))
 #define RBS_45DEG_IN_RAD      ((RBS_90DEG_IN_RAD * ((__PFPT__)0.5)))
 #define RBS_30DEG_IN_RAD      ((RBS_90DEG_IN_RAD) * ((__PFPT__)0.33333333))
-#define RBS_MAX_ANGLE_RAD     (RBS_45DEG_IN_RAD * 1.2)
+#define RBS_MAX_ANGLE_RAD     (RBS_45DEG_IN_RAD * 0.9)
 typedef enum
 {
 	RBS_LEFT_MOTOR = 0,
@@ -91,6 +92,9 @@ typedef struct
 typedef struct
 {
 	regul_pid_s pdForBalance_s;
+    
+    regul_ibsc_s ibscForBalance_s;
+    
 	__PFPT__ motorControl_a[RBS_MOTOR_NUMB];
 	__PFPT__ motorControl;
 	__PFPT__ desiredAngle;

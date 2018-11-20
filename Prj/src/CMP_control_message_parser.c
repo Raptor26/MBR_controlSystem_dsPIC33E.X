@@ -41,7 +41,7 @@ CMP_init_struct(
 	data->maxTimeout      = (uint32_t) 200000u;
 	data->zeroValue       = (int16_t) (data->maxControlValue / ((__PFPT__) 2.0));
 	data->discreteInc     =
-		(__PFPT__) ((__PFPT__) 0.55) / ((__PFPT__) data->zeroValue);
+		(__PFPT__) ((__PFPT__) 0.85) / ((__PFPT__) data->zeroValue);
 
 	data->filtForTargetSpeed_s.filtCoeff =
 		(__FILT_FPT__) 0.7;

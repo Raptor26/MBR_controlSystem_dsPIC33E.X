@@ -98,7 +98,7 @@ int main(
 			RBS_GetControlForRobot(
 				&RBS_balancingSystem_s,
 				robotPitchAngle,
-				NULL);
+				gyr_a[IISMPU_PITCH]);
 
 		if (DMA2CONbits.CHEN == 0)
 		{
