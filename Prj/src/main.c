@@ -15,6 +15,10 @@
 
 /*#### |Begin| --> Секция - "Глобальные переменные" ##########################*/
 char debugControlCmd[50];
+char recievedControlCmd[14];
+unsigned int controlCmdSize = sizeof (recievedControlCmd);
+char recievedTuningCmd[18];
+uint16_t tuningCmdSize = sizeof (recievedTuningCmd);
 float acc_a[IISMPU_VECT_SIZE];
 float gyr_a[IISMPU_VECT_SIZE];
 float mpuTemperature;
@@ -22,8 +26,6 @@ float mpuTemperature;
 
 
 /*#### |Begin| --> Секция - "Локальные переменные" ###########################*/
-char recievedControlCmd[14];
-unsigned int controlCmdSize = sizeof (recievedControlCmd);
 VTMR_tmr_s compFiltRuntime_s;
 cmp_control_data_s controlRobot_s;
 /*#### |End  | <-- Секция - "Локальные переменные" ###########################*/
@@ -92,7 +94,7 @@ int main(
 		}
 		/* ================================================================== */
 
-		/* Функция для получения управляющих воздействия для удержания робота 
+		/* Функция для получения управляющих воздействия для удержания робота
 		 * в заданном положении */
 		__PFPT__ leftRightMotorControl =
 			RBS_GetControlForRobot(
@@ -110,39 +112,56 @@ int main(
 				(__VMCPC_F3M_FPT__) RBS_balancingSystem_s.motorControl_a[RBS_RIGHT_MOTOR]);
 		}
 
-		if (CMP_receiveMessage_flag != 0 && DMA4CONbits.CHEN == 0)
+		if (DMA4CONbits.CHEN == 0)
 		{
-			CMP_receiveMessage_flag = 0;
-
-			/* Обработать принятый пакет */
-			cmp_message_status_e messageStatus_e =
-				CMP_parse_message(
-					&RBS_balancingSystem_s.speedControl_s.control_data_s,
-					recievedControlCmd);
-
-			/* Если принятый пакет данных валиден */
-			if (messageStatus_e == CMP_MESSAGE_VALID)
+			if (CMP_receiveMessage_flag != 0)
 			{
-				/* Перезапуск виртуального таймера */
-				VTMR_StartTimer(
-					&RBS_balancingSystem_s.speedControl_s.control_data_s.virtTmr);
+				CMP_receiveMessage_flag = 0;
+
+				/* Обработать принятый пакет */
+				cmp_message_status_e messageStatus_e =
+					CMP_parse_message(
+						&RBS_balancingSystem_s.speedControl_s.control_data_s,
+						recievedControlCmd);
+
+				/* Если принятый пакет данных валиден */
+				if (messageStatus_e == CMP_MESSAGE_VALID)
+				{
+					/* Перезапуск виртуального таймера */
+					VTMR_StartTimer(
+						&RBS_balancingSystem_s.speedControl_s.control_data_s.virtTmr);
+				}
+
+				/* Забить память нулями */
+				memset((void*) recievedControlCmd, '\0', controlCmdSize);
+
+				// int bytesCnt =
+				// 	sprintf(
+				// 		debugControlCmd,
+				// 		"speed = %f\r\ndirect = %f",
+				// 		RBS_balancingSystem_s.speedControl_s.control_data_s.targetSpeed,
+				// 		RBS_balancingSystem_s.speedControl_s.control_data_s.targetRotation);
 			}
 
-			/* Забить память нулями */
-			memset((void*) recievedControlCmd, '\0', controlCmdSize);
+			if (TMP_receiveTuningMessage_flag != 0)
+			{
+				TMP_receiveTuningMessage_flag = 0;
+                
+                TMP_parse_message(
+                    recievedTuningCmd,
+                    &RBS_balancingSystem_s.pdForBalance_s.proportional_s.kP,
+                    &RBS_balancingSystem_s.pdForBalance_s.integral_s.kI,
+                    &RBS_balancingSystem_s.pdForBalance_s.derivative_s.kD);
 
-			// int bytesCnt =
-			// 	sprintf(
-			// 		debugControlCmd,
-			// 		"speed = %f\r\ndirect = %f",
-			// 		RBS_balancingSystem_s.speedControl_s.control_data_s.targetSpeed,
-			// 		RBS_balancingSystem_s.speedControl_s.control_data_s.targetRotation);
+				/* Забить память нулями */
+				memset((void*) recievedTuningCmd, '\0', tuningCmdSize);
+			}
 		}
 
 		/* ################ Отладочная информация ####################### */
 		/* Формирование отладочного пакета данных */
-//		UDI_GetAndSendDebugPackForSerialPlot(
-//			&UDI_serialPlotDataPackage_s);
+		UDI_GetAndSendDebugPackForSerialPlot(
+			&UDI_serialPlotDataPackage_s);
 		/* ############################################################## */
 
 		PTWT_ProgTactEndLoop(
@@ -164,13 +183,13 @@ InitAllPeriphAndModules(
 
 	/*=== |Begin| --> Секция - "Конфигурирование периферии микроконтроллера" =*/
 	/* Инициализация тактового генератора */
-	#if defined (__USE_FRC_FOR_FCY__)
+#if defined (__USE_FRC_FOR_FCY__)
 	PIC_Init_Oscillator_FRC_8MHz_FOSC_128MHz_FCY_64MIPS();
-	#elif defined (__USE_HS_16_MHz_FOR_FCY__)
+#elif defined (__USE_HS_16_MHz_FOR_FCY__)
 	PIC_Init_Oscillator_HS_16MHz_FOSC_128MHz_FCY_64MIPS();
-	#else
+#else
 #error "Please, set source for system clock"
-	#endif
+#endif
 
 	/* Задержка чтобы успел проинициализироваться контроллер
 	 * векторного управления */
@@ -187,7 +206,7 @@ InitAllPeriphAndModules(
 //    Конфигурация Bluetooth модуля:
 //    AT+NAME=NCFU
 //    AT+PSWD="NCFU9999"
-//    AT+UART=460800,0,0
+//    AT+UART=9600,0,0
 
 	UDI_StartForceUart3_DMA4_Receiver(
 		(unsigned int*)recievedControlCmd,

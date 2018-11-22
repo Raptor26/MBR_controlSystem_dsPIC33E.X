@@ -38,6 +38,7 @@
 #include "../inc/RPA_robot_pitch_angle.h"
 #include "../inc/RBS_robot_balancing_system.h"
 #include "../inc/CMP_control_message_parser.h"
+#include "../inc/TMP_tuning_message_parser.h"
 /*==== |End  | <-- Секция - "Extern libraries" ===============================*/
 /*#### |End  | <-- Секция - "Include" ########################################*/
 
@@ -66,8 +67,10 @@ extern char debugControlCmd[50];
 extern float acc_a[3];
 extern float gyr_a[3];
 extern float mpuTemperature;
-extern unsigned int controlCmdSize;
 extern char recievedControlCmd[14];
+extern unsigned int controlCmdSize;
+extern char recievedTuningCmd[18];
+extern uint16_t tuningCmdSize;
 /*#### |End  | <-- Секция - "Определение глобальных переменных" ##############*/
 
 
