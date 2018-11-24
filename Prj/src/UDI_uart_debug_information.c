@@ -50,16 +50,6 @@ UDI_GetAndSendDebugPackForSerialPlot(
 		DI_CopyDataForSerialPlot_f32(
 			/* Указатель на структуру данных отладочного пакета данных */
 			p_s,
-
-			/* Показания акселерометра */
-			acc_a[IISMPU_ROLL],
-			acc_a[IISMPU_PITCH],
-			acc_a[IISMPU_YAW],
-
-			/* Показания гироскопа */
-			gyr_a[IISMPU_ROLL],
-			gyr_a[IISMPU_PITCH],
-			gyr_a[IISMPU_YAW],
 //
 //			/* Расчёт углов наклона */
 			RPA_copmFiltDataForPitch_s.angle,
@@ -68,6 +58,15 @@ UDI_GetAndSendDebugPackForSerialPlot(
 			RBS_balancingSystem_s.motorControl,
 
 			RPA_copmFiltDataForPitch_s.accNorm,
+			RPA_copmFiltDataForPitch_s.integralCoeff,
+			RBS_balancingSystem_s.speedControl_s.balancedAngle,
+			RBS_balancingSystem_s.speedControl_s.currSpeed,
+			RBS_balancingSystem_s.speedControl_s.currSpeedFilt,
+
+			RBS_balancingSystem_s.speedControl_s.control_data_s.targetSpeed,
+			RBS_balancingSystem_s.speedControl_s.control_data_s.targetRotation,
+
+			gyr_a[IISMPU_PITCH],
 
 			/* Терминальный символ, должен быть крайним параметром для
 			 * функции DI_CopyDataForSerialPlot_f32() */
@@ -292,24 +291,66 @@ _U3RXInterrupt (void)
 	// Сброс флага прерывания;
 	IFS5bits.U3RXIF = 0;
 	static size_t buffPoint = 0;
+	static size_t currentType = 2;
 	int temp = U3RXREG;
-	if (temp == 'S')
+//    Если текущий тип сообщения - не калибровочное, то проверяем его тип по
+//    заголовку
+	if (currentType != 1)
 	{
-		buffPoint = 0;
-		recievedControlCmd[buffPoint] = temp;
-//		UDI_StartForceUart3_DMA4_Receiver(
-//			(unsigned int*) &recievedControlCmd[1],
-//			13);
+		if (temp == 'S')
+		{
+			buffPoint = 0;
+			currentType = 0;
+			//		UDI_StartForceUart3_DMA4_Receiver(
+			//			(unsigned int*) &recievedControlCmd[1],
+			//			13);
+		}
+		else if (temp == 0xAA)
+		{
+			buffPoint = 0;
+			currentType = 1;
+		}
+		else
+		{
+			return;
+		}
 	}
-	else if (buffPoint != 0)
+	switch (currentType)
 	{
+	// Сообщение управления
+	case 0:
 		recievedControlCmd[buffPoint] = temp;
+		break;
+	// Сообщение калибровки
+	case 1:
+		recievedTuningCmd[buffPoint] = temp;
+		break;
 	}
+
 	buffPoint++;
-	if (buffPoint >= controlCmdSize)
+
+	switch (currentType)
 	{
-		CMP_receiveMessage_flag++;
-		buffPoint = 0;
+	// Сообщение управления
+	case 0:
+        if (buffPoint >= controlCmdSize)
+        {
+            // Текущее сообщение - управление
+            CMP_receiveMessage_flag++;
+            buffPoint = 0;
+            currentType = 2;
+        }
+		break;
+	// Сообщение калибровки
+	case 1:
+        if (buffPoint >= tuningCmdSize)
+        {
+            // Текущее сообщение - калибровка
+            TMP_receiveTuningMessage_flag++;
+            buffPoint = 0;
+            currentType = 2;
+        }
+		break;
 	}
 }
 

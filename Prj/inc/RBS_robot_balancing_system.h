@@ -58,7 +58,7 @@ typedef enum
 } rbs_left_right_motors_e;
 
 typedef struct
-{    
+{
 	/**
 	 * @brief Текущая скорость
 	 */
@@ -68,11 +68,11 @@ typedef struct
 	 * @brief Текущая скорость с применением фильтра
 	 */
 	__PFPT__ currSpeedFilt;
-    
-    __PFPT__ balancedAngle;
-    
-    filt_complementary_s compFilt_balancedAngle_s;
-    
+
+	__PFPT__ balancedAngle;
+
+	filt_complementary_s compFilt_balancedAngle_s;
+
 
 	/**
 	 * @brief Комплементарный фильтр для фильтрации текущей скорости
@@ -80,9 +80,9 @@ typedef struct
 	filt_complementary_s compFilt_s;
 
 	regul_pid_s piRegulator_s;
-    
-    regul_pid_s dRegulator_s;
-    
+
+	regul_pid_s dRegulator_s;
+
 	/**
 	 * @brief Структура с целевой скоростью и поворотом
 	 */
@@ -92,9 +92,9 @@ typedef struct
 typedef struct
 {
 	regul_pid_s pdForBalance_s;
-    
-    regul_ibsc_s ibscForBalance_s;
-    
+
+	regul_ibsc_s ibscForBalance_s;
+
 	__PFPT__ motorControl_a[RBS_MOTOR_NUMB];
 	__PFPT__ motorControl;
 	__PFPT__ desiredAngle;
@@ -103,8 +103,8 @@ typedef struct
 	 * @brief Структура для управления скорость движения робота
 	 */
 	rbs_speed_control_s speedControl_s;
-    
-    size_t startSystem_flag;
+
+	size_t startSystem_flag;
 } rbs_balancing_system_s;
 /*#### |End  | <-- Секция - "Определение типов" ##############################*/
 

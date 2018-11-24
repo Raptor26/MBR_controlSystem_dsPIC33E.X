@@ -336,7 +336,7 @@ RBS_Init_PD_ForRetentionDesiredPitchAngle(
 
 	/* Коэффициент пропорциональной составляющей регулятора */
 	pidInit_s.kP =
-		(__REGUL_FPT__) 55.0;
+		(__REGUL_FPT__) 75.0;
 
 	/* Коэффициент интегральной составляющей регулятора */
 	pidInit_s.kI =

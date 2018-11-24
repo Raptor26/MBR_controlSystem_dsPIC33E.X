@@ -61,10 +61,7 @@ CMP_parse_message(
 	cmp_control_data_s *data,
 	char *controlCmd)
 {
-	/* В чем смысл первого условия "if" ? */
-	if (*controlCmd != 0
-			&& controlCmd[0] == 'S'
-			&& controlCmd[5] == '\r'
+	if (controlCmd[5] == '\r'
 			&& controlCmd[6] == '\n'
 			&& controlCmd[7] == 'D'
 			&& controlCmd[12] == '\r'

@@ -1,19 +1,19 @@
 /**
- * @file   	%<%NAME%>%.%<%EXTENSION%>%
- * @author 	%<%USER%>%
+ * @file    %<%NAME%>%.%<%EXTENSION%>%
+ * @author  %<%USER%>%
  * @version
- * @date 	%<%DATE%>%, %<%TIME%>%
+ * @date    %<%DATE%>%, %<%TIME%>%
  * @brief
  */
 
 
 /*#### |Begin| --> Секция - "Include" ########################################*/
-#include "../inc/RPA_robot_pitch_angle.h"
+#include "../inc/TMP_tuning_message_parser.h"
 /*#### |End  | <-- Секция - "Include" ########################################*/
 
 
 /*#### |Begin| --> Секция - "Глобальные переменные" ##########################*/
-pcf_data_for_pitch_s RPA_copmFiltDataForPitch_s;
+size_t TMP_receiveTuningMessage_flag;
 /*#### |End  | <-- Секция - "Глобальные переменные" ##########################*/
 
 
@@ -26,38 +26,26 @@ pcf_data_for_pitch_s RPA_copmFiltDataForPitch_s;
 
 
 /*#### |Begin| --> Секция - "Описание глобальных функций" ####################*/
-__PFPT__
-RPA_GetPitchAngle(
-	__PFPT__ *pGyrPitch,
-	__PFPT__ accX,
-	__PFPT__ accY,
-	__PFPT__ accZ)
-{
-	return (PCF_GetPitchByCompFilt(
-				&RPA_copmFiltDataForPitch_s,
-				(__PCF_FPT__*)pGyrPitch,
-				(__PCF_FPT__)accX,
-				(__PCF_FPT__)accY,
-				(__PCF_FPT__)accZ));
-}
-
 void
-RPA_Init_DataForCalcPitchAngle(
-	void)
+TMP_parse_message(
+	char *tuningCmd,
+	__REGUL_FPT__ *kP,
+	__REGUL_FPT__ *kI,
+	__REGUL_FPT__ *kD)
 {
-	/* Инициализация констант для вычисления угла наклона*/
-	pcf_data_for_pitch_init_struct_s init_s;
-	PCF_CompFilt_StructInit(
-		&init_s);
-	init_s.compFiltCoeff		= (__PCF_FPT__) 0.9996f;
-	init_s.integralCoeff		= (__PCF_FPT__) 0.00002f;
-	init_s.dT					= (__PCF_FPT__) INTEGRATE_PERIOD_IN_SEC;
-	init_s.accNormWindow		= (__PCF_FPT__) 0.2;
-	init_s.compFiltValForAcc	= (__PCF_FPT__) 0.0;
-	init_s.integralErrorSaturation = (__PCF_FPT__) 0.15;
-	PCF_Init_CompFilt(
-		&RPA_copmFiltDataForPitch_s,
-		&init_s);
+	tmp_tuning_message *pMessage_s = (tmp_tuning_message*) tuningCmd;
+
+	uint8_t crc = CRC_XOR_Crc8(
+					  (uint8_t*) tuningCmd,
+					  sizeof(tmp_tuning_message) - 1);
+
+	if (pMessage_s->crc == crc)
+	{
+		*kP = pMessage_s->new_kP;
+		*kI = pMessage_s->new_kI;
+		*kD = pMessage_s->new_kD;
+	}
+
 }
 /*#### |End  | <-- Секция - "Описание глобальных функций" ####################*/
 
